@@ -28,6 +28,16 @@ class BS4WebScraper(WebScraper):
     self.polarity_evaluator = polarity_evaluator
   
   def find_teacher(self, name: str) -> Optional[Teacher]:
+    if name == 'SIN ASIGNAR':
+      return Teacher(
+        id=None,
+        name='SIN ASIGNAR',
+        comments=[],
+        subjects=[],
+        polarity=0.5,
+        url='https://foroupiicsa.net/diccionario/'
+      )
+    
     url = self._get_url_for_teacher(name.upper())
     response: Response = requests.get(url)
     response.raise_for_status()
@@ -44,7 +54,6 @@ class BS4WebScraper(WebScraper):
       subjects: List[str] = subjs
       
       if len(subjects) == 0:
-        print('No hay comentarios de ese profesor.')
         return None
 
 
