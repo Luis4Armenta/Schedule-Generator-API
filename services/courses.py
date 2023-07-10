@@ -34,12 +34,18 @@ class CoursesService:
         start_time = start_time if start_time else '07:00'
         end_time = end_time if end_time else '22:00'
         
+        out_time = False
+        
         for _, session in course.schedule.items():
           if session is not None:
             session_start, session_end = session
             
             if session_start < start_time or session_end > end_time:
-              continue
+              out_time = True
+              break
+        
+        if out_time:
+          continue
             
       filtered_courses.append(course)
     return filtered_courses
