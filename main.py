@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, File, UploadFile, Form
+from services.courses import CoursesService
 from dotenv import dotenv_values
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -9,6 +10,11 @@ from services.teacher import TeacherService
 from services.scraper import BS4WebScraper
 from services.polarity_evaluator import TextBlobEvaluator, PolarityEvaluator
 from services.translator import GoogleTranslator, Translator
+from bs4 import BeautifulSoup
+from lxml import etree
+from models.course import Course, ScheduleCourse, session
+from typing import List, Annotated
+from services.schedule import SchedulesService
 
 config = dotenv_values('.env')
 
@@ -48,6 +54,29 @@ def get_teacher_by_name(teacher_name: str = Query(min_length=5)):
   else:
     return JSONResponse(content={"message": "Teacher not found..."}, status_code=404)
 
+@app.post('/upload/')
+async def load(
+    file: UploadFile,
+    level: Annotated[str, Form()],
+    semester: Annotated[str, Form()],
+    start_time: Annotated[str, Form()],
+    end_time: Annotated[str, Form()]
+  ):
+  courses_service = CoursesService()
+  schedules_service = SchedulesService()
+  
+  
+  courses: List[Course] = courses_service.parse_courses(await file.read())
+ 
+  courses = courses_service.filter_coruses(courses, level, semester, start_time, end_time)
+  
+  schedules = schedules_service.generate_schedules(courses, 7)
+  
+  schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
+  
+  print(len(schedules))
+  return schedules
+  
   
 
 @app.on_event('shutdown')
