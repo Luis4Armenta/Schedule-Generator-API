@@ -9,7 +9,18 @@ class TeacherService:
     self.webscraper = web_scraper
   
   def get_teacher(self, name: str) -> Optional[Teacher]:
+    name = name.strip().upper()
     teacher = self.repository.get_teacher(name)
+    
+    if name == 'SIN ASIGNAR':
+      return Teacher(
+        id=None,
+        name='SIN ASIGNAR',
+        comments=[],
+        subjects=[],
+        polarity=0.5,
+        url='https://foroupiicsa.net/diccionario/'
+      )
     
     if teacher:
       return teacher
@@ -19,7 +30,7 @@ class TeacherService:
       if scraped_teacher:
         self.repository.add_teacher(scraped_teacher)
         
-        return self.get_teacher(name)
+        return self.repository.get_teacher(name)
       else: 
         return None
       
