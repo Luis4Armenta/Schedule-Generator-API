@@ -2,16 +2,17 @@ from repositories.teachers_repository import TeacherRepository
 from typing import Optional, List
 from models.teacher import Teacher
 from services.scraper import WebScraper
-import functools
+from functools import cache
+import re
 
 class TeacherService:
   def __init__(self, repository: TeacherRepository, web_scraper: WebScraper):
     self.repository = repository
     self.webscraper = web_scraper
   
-  @functools.lru_cache(maxsize=None)
+  @cache
   def get_teacher(self, name: str) -> Optional[Teacher]:
-    name = name.strip().upper()
+    name = clean_name(name)
     
     if name == 'SIN ASIGNAR':
       return Teacher(
@@ -37,3 +38,11 @@ class TeacherService:
       else: 
         return None
       
+def clean_name(name: str) -> str:
+  # Eliminar caracteres especiales y convertir a mayúsculas
+  cleaned_name = re.sub(r'[^a-zA-Z\s]', '', name).upper()
+  # Eliminar espacios innecesarios
+  cleaned_name = re.sub(r'\s+', ' ', cleaned_name)
+  # Eliminar espacios al inicio y al final de la cadena
+  cleaned_name = cleaned_name.strip()
+  return cleaned_name 

@@ -1,7 +1,6 @@
-import re
 from abc import ABC
 from typing import Optional, List
-from models.teacher import Teacher, Comment, PyObjectId
+from models.teacher import Teacher, Comment
 from typing import Optional
 import requests
 from requests import Response
@@ -96,16 +95,9 @@ class BS4WebScraper(WebScraper):
     else:
       return None
     
-    
-  def _parse_name(self, name: str) -> str:
-    name_without_especial_characters = re.sub(r'[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]', '', name.strip())
-    name_without_spaces = name_without_especial_characters.replace(' ', '+')
-    
-    return name_without_spaces
-
 
   def _get_url_for_teacher(self, teacher: str) -> str:
-    parsed_name: str = self._parse_name(teacher.strip()).upper()
+    parsed_name: str = teacher.replace(' ', '+')
     
     url = f'https://foroupiicsa.net/diccionario/buscar/{parsed_name}'
     return url
