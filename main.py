@@ -1,3 +1,4 @@
+import time
 from fastapi import FastAPI, Query, File, UploadFile, Form
 from services.courses import CoursesService
 from dotenv import dotenv_values
@@ -8,8 +9,10 @@ from repositories.mongo_teachers_repository import MongoTeachersRepository
 from models.teacher import Teacher
 from services.teacher import TeacherService
 from services.scraper import BS4WebScraper
-from services.polarity_evaluator import TextBlobEvaluator, PolarityEvaluator
+from services.evaluator.evaluator import TeacherEvaluator
+from services.evaluator.text_blob_evaluator import TextBlobEvaluator
 from services.translator import GoogleTranslator, Translator
+from services.evaluator.azure_evaluator import AzureEvaluator
 from bs4 import BeautifulSoup
 from lxml import etree
 from models.course import Course, ScheduleCourse, session
@@ -35,19 +38,13 @@ def startup_db_clients():
 
 @app.get('/', tags=['home'])
 def message() -> HTMLResponse:
-  print(config['MONGODB_HOST'])
-  print(config['MONGODB_PORT'])
-  print(config['MONGODB_DATABASE'])
   return HTMLResponse('<h1>Profesores API</h1>')
 
 @app.get('/teachers/', tags=['Teachers'])
 def get_teacher_by_name(teacher_name: str = Query(min_length=5)):
-  google_translator: Translator = GoogleTranslator()
-  polarity_evaluator: PolarityEvaluator = TextBlobEvaluator(google_translator)
-  teacher_service = TeacherService(app.teachers, BS4WebScraper(polarity_evaluator))
-  teacher = teacher_service.get_teacher(teacher_name.strip().upper())
-
-
+  teacher_evaluator: TeacherEvaluator = AzureEvaluator()
+  teacher_service = TeacherService(app.teachers, BS4WebScraper(teacher_evaluator))
+  teacher = teacher_service.get_teacher(teacher_name)
 
   if teacher:
     return JSONResponse(content=jsonable_encoder(teacher), status_code=202)
@@ -57,25 +54,40 @@ def get_teacher_by_name(teacher_name: str = Query(min_length=5)):
 @app.post('/upload/')
 async def load(
     file: UploadFile,
-    level: Annotated[str, Form()],
-    semester: Annotated[str, Form()],
-    start_time: Annotated[str, Form()],
-    end_time: Annotated[str, Form()]
+    file2: UploadFile = None,
+    level: Annotated[str, Form()] = None,
+    semester: Annotated[str, Form()] = None,
+    start_time: Annotated[str, Form()] = None,
+    end_time: Annotated[str, Form()] = None,
+    length: Annotated[int, Form] = 7
   ):
-  courses_service = CoursesService()
-  schedules_service = SchedulesService()
   
+  start = time.time()
+  courses_service = CoursesService()
+  teacher_service = TeacherService(app.teachers, BS4WebScraper(AzureEvaluator()))
+  schedules_service = SchedulesService(teacher_service)
   
   courses: List[Course] = courses_service.parse_courses(await file.read())
+  
+  if file2:
+    courses = courses + courses_service.parse_courses(await file2.read())
  
+ 
+  print(f'Número de cursos sin filtrar: {len(courses)}')
   courses = courses_service.filter_coruses(courses, level, semester, start_time, end_time)
+  print(f'Número de cursos después de filtrar {len(courses)}')
   
-  schedules = schedules_service.generate_schedules(courses, 7)
+  print('Geneerado horarios...')
+  schedules = schedules_service.generate_schedules(courses, length)
   
+  print('Ordenadno horarios...')
   schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
+  print(f'Número de horarios generados: {len(schedules)}')
   
-  print(len(schedules))
-  return schedules
+  end = time.time()
+  print("Time Taken: {:.6f}s".format(end-start))
+
+  return schedules[:25]
   
   
 
