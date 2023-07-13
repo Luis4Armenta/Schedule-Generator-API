@@ -1,6 +1,6 @@
 from abc import ABC, abstractclassmethod
 
-class PolarityEvaluator(ABC):
+class TeacherEvaluator(ABC):
   
   @abstractclassmethod
   def get_polarity(self, text: str) -> float:

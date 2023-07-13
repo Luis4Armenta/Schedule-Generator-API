@@ -7,15 +7,12 @@ from repositories.mongo_teachers_repository import MongoTeachersRepository
 from services.scraper import BS4WebScraper
 from services.evaluator.text_blob_evaluator import TextBlobEvaluator
 from services.translator import GoogleTranslator
+from services.evaluator.azure_evaluator import AzureEvaluator
 from statistics import mean 
 
 class SchedulesService:
-  def __init__(self):
-    self._teachers_service = TeacherService(MongoTeachersRepository({
-        'host': 'localhost',
-        'port': 27017,
-        'database': 'teachers_dictionari'
-      }), BS4WebScraper(TextBlobEvaluator(GoogleTranslator())))
+  def __init__(self, teacher_service: TeacherService):
+    self._teachers_service = teacher_service
   
   def select_a_course(self, courses: List[Course], selected_course: Course) -> List[Course]:
     filtered_courses: List[Course] = []

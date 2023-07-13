@@ -7,7 +7,7 @@ from typing import Optional
 from requests import Response
 from typing import Optional, List
 from models.teacher import Teacher, Comment
-from services.evaluator.evaluator import PolarityEvaluator
+from services.evaluator.evaluator import TeacherEvaluator
 
 class WebScraper(ABC):
   def find_teacher(self, name: str) -> Optional[Teacher]:
@@ -22,7 +22,7 @@ class WebScraper(ABC):
   # dislikes: './/a[@rel="nolike"]//span/text()' 
 
 class BS4WebScraper(WebScraper):
-  def __init__(self, polarity_evaluator: PolarityEvaluator):
+  def __init__(self, polarity_evaluator: TeacherEvaluator):
     self.polarity_evaluator = polarity_evaluator
   
   def find_teacher(self, name: str) -> Optional[Teacher]:

@@ -1,10 +1,9 @@
 from typing import Optional
 from textblob import TextBlob
 from services.translator import Translator
+from services.evaluator.evaluator import TeacherEvaluator
 
-from services.evaluator.evaluator import PolarityEvaluator
-
-class TextBlobEvaluator(PolarityEvaluator):
+class TextBlobEvaluator(TeacherEvaluator):
   def __init__(self, translator: Optional[Translator]):
     if translator:
       self.translator = translator
