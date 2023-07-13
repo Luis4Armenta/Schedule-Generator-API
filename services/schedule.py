@@ -5,7 +5,7 @@ from models.schedule import Schedule
 from services.teacher import TeacherService
 from repositories.mongo_teachers_repository import MongoTeachersRepository
 from services.scraper import BS4WebScraper
-from services.polarity_evaluator import TextBlobEvaluator
+from services.evaluator.text_blob_evaluator import TextBlobEvaluator
 from services.translator import GoogleTranslator
 from statistics import mean 
 

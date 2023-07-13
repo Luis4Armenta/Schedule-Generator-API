@@ -1,15 +1,9 @@
+from typing import Optional
 from textblob import TextBlob
 from services.translator import Translator
-from abc import ABC, abstractclassmethod
-from typing import Optional
 
+from services.evaluator.evaluator import PolarityEvaluator
 
-class PolarityEvaluator(ABC):
-  
-  @abstractclassmethod
-  def get_polarity(self, text: str) -> float:
-    pass
-  
 class TextBlobEvaluator(PolarityEvaluator):
   def __init__(self, translator: Optional[Translator]):
     if translator:
@@ -29,3 +23,4 @@ class TextBlobEvaluator(PolarityEvaluator):
       return polarity
     else:
       return 0.0
+    

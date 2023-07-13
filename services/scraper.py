@@ -1,18 +1,17 @@
-from abc import ABC
-from typing import Optional, List
-from models.teacher import Teacher, Comment
-from typing import Optional
-import requests
-from requests import Response
 import bs4
+import requests
+from abc import ABC
 from lxml import etree
 from statistics import mean
-from services.polarity_evaluator import PolarityEvaluator
+from typing import Optional
+from requests import Response
+from typing import Optional, List
+from models.teacher import Teacher, Comment
+from services.evaluator.evaluator import PolarityEvaluator
 
 class WebScraper(ABC):
   def find_teacher(self, name: str) -> Optional[Teacher]:
     pass
-    
 
 # name: '//h5//span/text()'
 # subjects: '//span[@class="bluetx negritas"]/text()'
