@@ -20,6 +20,7 @@ from typing import List, Annotated
 from services.schedule import SchedulesService
 from repositories.courses_repository import CourseRepository
 from repositories.mongo_courses_repository import MongoCourseRepository
+from schemas.schedule import ScheduleGeneratorRequest
 
 config = dotenv_values('.env')
 
@@ -86,6 +87,43 @@ def get_courses(
   filtered_courses = course_service.get_courses(career, level, semester, shift)
   
   return filtered_courses
+  
+  
+@app.get('/schedules/', tags=['Schedules'])
+async   def generate_schedules(request: ScheduleGeneratorRequest):
+  start = time.time()
+  teacher_service = TeacherService(app.teachers, BS4WebScraper(AzureEvaluator()))
+  courses_service = CoursesService(app.courses, teacher_service)
+  schedules_service = SchedulesService(teacher_service)
+
+  courses = courses_service.get_courses(
+      request.career,
+      request.levels,
+      request.semesters,
+      request.shifts
+    )
+  
+  print(f'Número de cursos sin filtrar: {len(courses)}')
+  courses = courses_service.filter_coruses(
+      courses,
+      request.start_time,
+      request.end_time,
+      request.unwanted_teachers
+    )
+  print(f'Número de cursos después de filtrar {len(courses)}')
+  
+  print('Geneerado horarios...')
+  schedules = schedules_service.generate_schedules(courses, request.length)
+  
+  print('Ordenadno horarios...')
+  schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
+  print(f'Número de horarios generados: {len(schedules)}')
+  
+  end = time.time()
+  print("Time Taken: {:.6f}s".format(end-start))
+
+  return schedules[:10]
+  
   
 
 @app.post('/upload/')

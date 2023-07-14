@@ -1,5 +1,7 @@
+import re
 from lxml import etree
 from bs4 import BeautifulSoup
+from unidecode import unidecode
 from typing import Optional, List
 from models.course import Course, session, ScheduleCourse
 from repositories.courses_repository import CourseRepository
@@ -14,25 +16,14 @@ class CoursesService:
   def filter_coruses(
     self,
     courses: List[Course],
-    level: Optional[str],
-    semester: Optional[str],
     start_time: Optional[str],
-    end_time: Optional[str], 
+    end_time: Optional[str],
+    unwanted_teachers: List[str] = []
   ) -> List[Course]:
+    unwanted_teachers = [clean_name(unwanted_teacher) for unwanted_teacher in unwanted_teachers]
     filtered_courses: List[Course] = []
     
     for course in courses:
-      
-      # filter courses by level
-      if level:
-        if course.sequence.upper()[0] != level.upper():
-          continue
-      
-      # filter courses by semester
-      if semester:
-        if course.sequence.upper()[3] != semester.upper():
-          continue
-      
       # filter courses by time
       if start_time or end_time:
         start_time = start_time if start_time else '07:00'
@@ -51,6 +42,9 @@ class CoursesService:
         if out_time:
           continue
             
+      if clean_name(course.teacher) in unwanted_teachers:
+        continue
+      
       filtered_courses.append(course)
     return filtered_courses
   
@@ -118,26 +112,31 @@ class CoursesService:
   def get_courses(
       self,
       career: str,
-      level: str,
-      semester: Optional[str],
-      shift: Optional[str]
+      levels: List[str],
+      semesters: List[str],
+      shifts: List[str]
     ):
-    query = {}
     
-    if career is not None:
-      query['career'] = career
+    expression = generate_regex(levels, career, shifts, semesters)
+    query = {
+      "sequence": {
+        "$regex": expression,
+        "$options": 'i'
+      }
+    }
     
-    if level is not None:
-        query["level"] = level
-
-    if semester is not None:
-        query["semester"] = semester
-
-    if shift is not None:
-        query["shift"] = shift
-
     return self.course_repository.get_courses(query)
   
+
+def generate_regex(levels, career, shifts, semesters):
+    level_regex = '|'.join(levels)
+    career_regex = re.escape(career)
+    shift_regex = '|'.join(shifts)
+    semester_regex = '|'.join(semesters)
+    
+    regex_pattern = r'^[' + level_regex + r'][' + career_regex + r'][' + shift_regex + r'][' + semester_regex + r'][0-9]+$'
+    return regex_pattern
+
 def get_sessions(raw_course) -> session:
   sessions: List[session] = []
   
@@ -150,3 +149,14 @@ def get_sessions(raw_course) -> session:
       sessions.append(None)
       
   return sessions
+
+def clean_name(name: str) -> str:
+    # Convertir caracteres especiales a su equivalente sin acentos
+    cleaned_name = unidecode(name)
+    # Eliminar caracteres no alfabéticos y convertir a mayúsculas
+    cleaned_name = re.sub(r'[^a-zA-Z\s]', '', cleaned_name).upper()
+    # Eliminar espacios innecesarios
+    cleaned_name = re.sub(r'\s+', ' ', cleaned_name)
+    # Eliminar espacios al inicio y al final de la cadena
+    cleaned_name = cleaned_name.strip()
+    return cleaned_name

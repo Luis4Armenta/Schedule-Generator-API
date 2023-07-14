@@ -30,7 +30,6 @@ class MongoCourseRepository(CourseRepository):
     self.course_collection = self.database['courses']
 
   def get_courses(self, query: dict) -> List[Course]:
-    query = {}
     
     filtered_courses = self.course_collection.find(query)
     courses = [Course(**course) for course in filtered_courses]
