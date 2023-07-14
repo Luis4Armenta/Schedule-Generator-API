@@ -1,9 +1,12 @@
-from repositories.teachers_repository import TeacherRepository
-from typing import Optional, List
+import re
+from typing import Optional
+from functools import cache
+from unidecode import unidecode
 from models.teacher import Teacher
 from services.scraper import WebScraper
-from functools import cache
-import re
+from repositories.teachers_repository import TeacherRepository
+      
+
 
 class TeacherService:
   def __init__(self, repository: TeacherRepository, web_scraper: WebScraper):
@@ -37,12 +40,14 @@ class TeacherService:
         return self.repository.get_teacher(name)
       else: 
         return None
-      
+
 def clean_name(name: str) -> str:
-  # Eliminar caracteres especiales y convertir a mayúsculas
-  cleaned_name = re.sub(r'[^a-zA-Z\s]', '', name).upper()
-  # Eliminar espacios innecesarios
-  cleaned_name = re.sub(r'\s+', ' ', cleaned_name)
-  # Eliminar espacios al inicio y al final de la cadena
-  cleaned_name = cleaned_name.strip()
-  return cleaned_name 
+    # Convertir caracteres especiales a su equivalente sin acentos
+    cleaned_name = unidecode(name)
+    # Eliminar caracteres no alfabéticos y convertir a mayúsculas
+    cleaned_name = re.sub(r'[^a-zA-Z\s]', '', cleaned_name).upper()
+    # Eliminar espacios innecesarios
+    cleaned_name = re.sub(r'\s+', ' ', cleaned_name)
+    # Eliminar espacios al inicio y al final de la cadena
+    cleaned_name = cleaned_name.strip()
+    return cleaned_name
