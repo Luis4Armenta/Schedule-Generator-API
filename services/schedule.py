@@ -8,7 +8,7 @@ from services.scraper import BS4WebScraper
 from services.evaluator.text_blob_evaluator import TextBlobEvaluator
 from services.translator import GoogleTranslator
 from services.evaluator.azure_evaluator import AzureEvaluator
-from statistics import mean 
+from statistics import mean, median
 
 class SchedulesService:
   def __init__(self, teacher_service: TeacherService):
@@ -44,21 +44,15 @@ class SchedulesService:
   def generate_schedules(self, courses: List[Course], n: int) -> List[Schedule]:
     def backtrack(schedule: List[Course], start_index: int):
         if len(schedule) == n:
-            # schedules.append(schedule.copy())
 
             teachers_polarity: List[float] = []
 
             for course in schedule:
-              teacher = self._teachers_service.get_teacher(course.teacher)
-              
-              if teacher:
-                teachers_polarity.append(teacher.polarity)
-              else:
-                teachers_polarity.append(0.5)
+              teachers_polarity.append(course.teacher_popularity)
               
             schedule_result = Schedule(
+              popularity=median(teachers_polarity),
               courses = schedule,
-              popularity=mean(teachers_polarity)
             )
               
             schedules.append(schedule_result)
