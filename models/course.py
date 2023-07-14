@@ -12,9 +12,18 @@ class ScheduleCourse(TypedDict):
 
 class Course(BaseModel):
   id: Optional[str]
+  
   sequence: str
-  subject: str
   teacher: str
+  subject: str
+  teacher_popularity: Optional[float]
+  
+  level: str
+  career:str
+  shift: str
+  semester: str
+  consecutive: str
+  
   schedule: ScheduleCourse
   
 class Schedule(BaseModel):

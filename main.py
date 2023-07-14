@@ -18,6 +18,8 @@ from lxml import etree
 from models.course import Course, ScheduleCourse, session
 from typing import List, Annotated
 from services.schedule import SchedulesService
+from repositories.courses_repository import CourseRepository
+from repositories.mongo_courses_repository import MongoCourseRepository
 
 config = dotenv_values('.env')
 
@@ -35,6 +37,14 @@ def startup_db_clients():
   
   app.teachers.connect()
   
+  app.courses: CourseRepository = MongoCourseRepository({
+    'host': config['MONGODB_HOST'],
+    'port': int(config['MONGODB_PORT']),
+    'database': config['MONGODB_DATABASE']
+  })
+  
+  app.courses.connect()
+  
 
 @app.get('/', tags=['home'])
 def message() -> HTMLResponse:
@@ -51,6 +61,33 @@ def get_teacher_by_name(teacher_name: str = Query(min_length=5)):
   else:
     return JSONResponse(content={"message": "Teacher not found..."}, status_code=404)
 
+@app.post('/courses/', tags=['Courses'])
+async def upload_schedules(file: UploadFile):
+  teacher_evaluator: TeacherEvaluator = AzureEvaluator()
+  teacher_service = TeacherService(app.teachers, BS4WebScraper(teacher_evaluator))
+  course_service = CoursesService(app.courses, teacher_service)
+  
+  courses: List[Course] = course_service.parse_courses(await file.read())
+  course_service.upload_courses(courses)
+  
+  return JSONResponse(content={"message": "Schedules uploaded!"}, status_code=202)
+
+@app.get('/courses/', tags=['Courses'])
+def get_courses(
+    level: str = Query(min_length= 1,max_length=1),
+    career: str = Query(min_length=1, max_length=1),
+    shift: str = Query(min_length=1, max_length=1, default=None),
+    semester: str = Query(min_length=1, max_length=1, default=None),
+  ):
+  teacher_evaluator: TeacherEvaluator = AzureEvaluator()
+  teacher_service = TeacherService(app.teachers, BS4WebScraper(teacher_evaluator))
+  course_service = CoursesService(app.courses, teacher_service)
+  
+  filtered_courses = course_service.get_courses(career, level, semester, shift)
+  
+  return filtered_courses
+  
+
 @app.post('/upload/')
 async def load(
     file: UploadFile,
@@ -63,8 +100,8 @@ async def load(
   ):
   
   start = time.time()
-  courses_service = CoursesService()
   teacher_service = TeacherService(app.teachers, BS4WebScraper(AzureEvaluator()))
+  courses_service = CoursesService(app.courses, teacher_service)
   schedules_service = SchedulesService(teacher_service)
   
   courses: List[Course] = courses_service.parse_courses(await file.read())
@@ -94,3 +131,4 @@ async def load(
 @app.on_event('shutdown')
 def shutdown_db_clients():
   app.teachers.disconnect()
+  app.courses.disconnect()

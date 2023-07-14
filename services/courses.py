@@ -1,11 +1,15 @@
-from typing import Optional, List
-from models.course import Course, session, ScheduleCourse
 from lxml import etree
 from bs4 import BeautifulSoup
+from typing import Optional, List
+from models.course import Course, session, ScheduleCourse
+from repositories.courses_repository import CourseRepository
+from repositories.teachers_repository import TeacherRepository
+from services.teacher import TeacherService
 
 class CoursesService:
-  def __init__(self):
-    pass
+  def __init__(self, course_repository: CourseRepository, teacher_service: TeacherService):
+    self.course_repository = course_repository
+    self.teacher_repository = teacher_service
   
   def filter_coruses(
     self,
@@ -58,6 +62,9 @@ class CoursesService:
 
 
     for idx, raw_course in enumerate(raw_courses):
+      sequence = raw_course.xpath('./td/text()')[0].strip().upper()
+      teacher_name = raw_course.xpath('./td/text()')[2]
+
       sessions = get_sessions(raw_course)
       
       schedule_course: ScheduleCourse = ScheduleCourse()
@@ -67,18 +74,70 @@ class CoursesService:
       schedule_course['thursday'] = sessions[3]
       schedule_course['friday'] = sessions[4]
       
+      teacher = self.teacher_repository.get_teacher(teacher_name)
+      
+      popularity: float = 0.0
+      if teacher:
+        popularity = teacher.polarity
+      else:
+        popularity = 0.5
+        
+
       course = Course(
         id=idx,
-        sequence=raw_course.xpath('./td/text()')[0],
+        sequence=sequence,
         subject=raw_course.xpath('./td/text()')[1],
-        teacher=raw_course.xpath('./td/text()')[2],
-        schedule=schedule_course
+        teacher=teacher_name,
+        schedule=schedule_course,
+
+        level=sequence[0],
+        career=sequence[1],
+        shift=sequence[2],
+        semester=sequence[3],
+        consecutive=sequence[4],
+        teacher_popularity=popularity
       )
 
       courses.append(course)
 
     return courses
+
+  def upload_courses(self, courses: List[Course]):
+    for course in courses:
+      teacher = self.teacher_repository.get_teacher(course.teacher)
       
+      popularity: float = 0.0
+      if teacher:
+        popularity = teacher.polarity
+      else:
+        popularity = 0.5
+      
+      course.teacher_popularity = popularity
+      self.course_repository.add_course_if_not_exist(course)
+  
+  def get_courses(
+      self,
+      career: str,
+      level: str,
+      semester: Optional[str],
+      shift: Optional[str]
+    ):
+    query = {}
+    
+    if career is not None:
+      query['career'] = career
+    
+    if level is not None:
+        query["level"] = level
+
+    if semester is not None:
+        query["semester"] = semester
+
+    if shift is not None:
+        query["shift"] = shift
+
+    return self.course_repository.get_courses(query)
+  
 def get_sessions(raw_course) -> session:
   sessions: List[session] = []
   
