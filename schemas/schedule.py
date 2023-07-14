@@ -11,3 +11,8 @@ class ScheduleGeneratorRequest(BaseModel):
   shifts: List[str] = ['M', 'V']
   length: int = 7
   
+class CoursesRequest(BaseModel):
+  career: str
+  levels: List[str]
+  semesters: List[str]
+  shifts: List[str] = ['M', 'V']
