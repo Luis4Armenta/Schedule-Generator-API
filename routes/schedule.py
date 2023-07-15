@@ -35,7 +35,6 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
     required_subject_level = required_subject_sequence[0]
     required_subject_shift = required_subject_sequence[2]
     required_subject_semester = required_subject_sequence[3]
-    required_subject_career = required_subject_sequence[1]
     
     if (
         not any(required_subject_level == level for level in request.levels) or
@@ -43,11 +42,9 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
         not any(required_subject_semester == semester for semester in request.semesters)
       ):
         courses = courses + courses_service.get_courses_by_subject(
+          sequence=required_subject_sequence,
           subject=required_subject,
-          level=required_subject_level,
-          career=required_subject_career,
-          shifts=[required_subject_shift],
-          semester=required_subject_semester,
+          shifts=[required_subject_shift]
         )
     
   for extra_subject in request.extra_subjects:

@@ -1,12 +1,16 @@
-import re
 from lxml import etree
 from bs4 import BeautifulSoup
-from unidecode import unidecode
 from typing import Optional, List
+
+from services.teacher import TeacherService
+
 from models.course import Course, session, ScheduleCourse
+
 from repositories.courses_repository import CourseRepository
 from repositories.teachers_repository import TeacherRepository
-from services.teacher import TeacherService
+
+from utils.text import generate_regex, clean_name
+
 
 class CoursesService:
   def __init__(self, course_repository: CourseRepository, teacher_service: TeacherService):
@@ -127,44 +131,32 @@ class CoursesService:
       shifts: List[str]
     ) -> List[Course]:
     
-    expression = generate_regex(levels, career, shifts, semesters)
-    query = {
-      "sequence": {
-        "$regex": expression,
-        "$options": 'i'
-      }
-    }
-    
-    return self.course_repository.get_courses(query)
+    return self.course_repository.get_courses(
+      levels=levels,
+      career=career,
+      semesters=semesters,
+      shifts=shifts
+    )
   
   def get_courses_by_subject(
-    self, 
-    subject: str,
-    level: str,
-    career: str,
-    semester: str,
-    shifts: List[str] = ['M', 'V'],
+      self,
+      sequence: str,
+      subject: str,
+      shifts: List[str] = ['M', 'V']
     ) -> List[Course]:
-    expression = generate_regex([level], career, shifts, [semester])
+    level = sequence[0]
+    career = sequence[1]
+    shifts = shifts,
+    semester = sequence[3]
     
-    query = {
-      "sequence": {
-        "$regex": expression,
-        "$options": 'i'
-      },
-      "subject": subject
-    }
-    
-    return self.course_repository.get_courses(query)
+    return self.course_repository.get_courses(
+      levels=[level],
+      shifts=shifts,
+      career=career,
+      semesters=[semester],
+      subjects=[subject]
+    )
 
-def generate_regex(levels: List[str], career, shifts: List[str], semesters: List[str]):
-    level_regex = '|'.join(levels)
-    career_regex = re.escape(career)
-    shift_regex = '|'.join(shifts)
-    semester_regex = '|'.join(semesters)
-    
-    regex_pattern = r'^[' + level_regex + r'][' + career_regex + r'][' + shift_regex + r'][' + semester_regex + r'][0-9]+$'
-    return regex_pattern
 
 def get_sessions(raw_course) -> session:
   sessions: List[session] = []
@@ -179,13 +171,3 @@ def get_sessions(raw_course) -> session:
       
   return sessions
 
-def clean_name(name: str) -> str:
-    # Convertir caracteres especiales a su equivalente sin acentos
-    cleaned_name = unidecode(name)
-    # Eliminar caracteres no alfabéticos y convertir a mayúsculas
-    cleaned_name = re.sub(r'[^a-zA-Z\s]', '', cleaned_name).upper()
-    # Eliminar espacios innecesarios
-    cleaned_name = re.sub(r'\s+', ' ', cleaned_name)
-    # Eliminar espacios al inicio y al final de la cadena
-    cleaned_name = cleaned_name.strip()
-    return cleaned_name
