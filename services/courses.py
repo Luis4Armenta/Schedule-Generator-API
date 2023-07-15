@@ -125,7 +125,7 @@ class CoursesService:
       levels: List[str],
       semesters: List[str],
       shifts: List[str]
-    ):
+    ) -> List[Course]:
     
     expression = generate_regex(levels, career, shifts, semesters)
     query = {
@@ -137,6 +137,25 @@ class CoursesService:
     
     return self.course_repository.get_courses(query)
   
+  def get_courses_by_subject(
+    self, 
+    subject: str,
+    level: str,
+    career: str,
+    semester: str,
+    shifts: List[str] = ['M', 'V'],
+    ) -> List[Course]:
+    expression = generate_regex([level], career, shifts, [semester])
+    
+    query = {
+      "sequence": {
+        "$regex": expression,
+        "$options": 'i'
+      },
+      "subject": subject
+    }
+    
+    return self.course_repository.get_courses(query)
 
 def generate_regex(levels: List[str], career, shifts: List[str], semesters: List[str]):
     level_regex = '|'.join(levels)

@@ -41,30 +41,32 @@ class SchedulesService:
         
     return filtered_courses
 
-  def generate_schedules(self, courses: List[Course], n: int, static_courses: List[Course] = []) -> List[Schedule]:
+  def generate_schedules(
+      self,
+      courses: List[Course],
+      n: int,
+      required_subjects: List[str] = [],
+    ) -> List[Schedule]:
     def backtrack(schedule: List[Course], start_index: int):
       # Verificar si se ha alcanzado el tamaño objetivo del horario
       if len(schedule) == n:
-        # Calcular la polaridad promedio de los profesores en el horario
-        teachers_polarity: List[float] = []
-        for course in schedule:
-          teachers_polarity.append(course.teacher_popularity)
+        schedule_subjects = [course.subject for course in schedule]
         
-        schedule_result = Schedule(
-          popularity=median(teachers_polarity),
-          courses=schedule,
-        )
-        schedules.append(schedule_result)
-        return
+        if all(required_subject in schedule_subjects for required_subject in required_subjects):
+          # Calcular la polaridad promedio de los profesores en el horario
+          teachers_polarity: List[float] = []
+          for course in schedule:
+            teachers_polarity.append(course.teacher_popularity)
+          
+          schedule_result = Schedule(
+            popularity=mean(teachers_polarity),
+            courses=schedule,
+          )
+          schedules.append(schedule_result)
+          return
+        else:
+          return
 
-      # Si hay cursos prioritarios, se agregan primero
-      if static_courses:
-        for curso_prioritario in static_courses:
-          if is_valid(schedule, curso_prioritario):
-            schedule.append(curso_prioritario)
-            backtrack(schedule, start_index)
-            schedule.pop()
-      
       # Iterar sobre los cursos regulares, comenzando desde el índice de inicio
       for i in range(start_index, len(courses)):
         if is_valid(schedule, courses[i]):

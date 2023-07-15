@@ -11,7 +11,8 @@ class ScheduleGeneratorRequest(BaseModel):
   length: int = 7
   excluded_teachers: List[str] = []
   excluded_subjects: List[str] = []
-  # subjects_required: List[Tuple[str, str]] = []
+  required_subjects: List[Tuple[str, str]] = []
+  extra_subjects: List[Tuple[str, str]] = []
   
 class CoursesRequest(BaseModel):
   career: str

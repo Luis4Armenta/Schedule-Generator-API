@@ -8,7 +8,7 @@ class CourseRepository(ABC):
     pass
     
   @abstractmethod
-  def get_courses(query: dict) -> List[Course]:
+  def get_courses(self, query: dict) -> List[Course]:
     pass
   
   # @abstractmethod
