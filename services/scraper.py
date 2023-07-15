@@ -68,7 +68,7 @@ class BS4WebScraper(WebScraper):
         date: str = raw_comment.xpath('.//p[@class="fecha"]/text()')[0]
         polarity: float = self.teacher_evaluator.get_polarity(text)
         
-        polarities.append((polarity+1)/2)
+        polarities.append(polarity)
         
         comment: Comment = {
           'text': text,
