@@ -1,15 +1,16 @@
 import time
+from typing import List
+
 from fastapi import APIRouter
 
-from typing import List
-from models.schedule import Schedule
-from services.scraper import BS4WebScraper
-from services.courses import CoursesService
-from services.teacher import TeacherService
-from services.schedule import SchedulesService
-from schemas.schedule import ScheduleGeneratorRequest
-from services.evaluator.azure_evaluator import AzureEvaluator
 from models.course import Course
+from schemas.schedule import ScheduleGeneratorRequest
+
+from services.scraper import BS4WebScraper
+from services.courses import CourseService
+from services.teacher import TeacherService
+from services.schedule import ScheduleService
+from services.evaluator.azure_evaluator import AzureEvaluator
 
 router = APIRouter()
 
@@ -17,10 +18,10 @@ router = APIRouter()
 async   def generate_schedules(request: ScheduleGeneratorRequest):
   start = time.time()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureEvaluator()))
-  courses_service = CoursesService(router.courses, teacher_service)
-  schedules_service = SchedulesService(teacher_service)
+  course_service = CourseService(router.courses, teacher_service)
+  schedule_service = ScheduleService(teacher_service)
 
-  courses: List[Course] = courses_service.get_courses(
+  courses: List[Course] = course_service.get_courses(
       request.career,
       request.levels,
       request.semesters,
@@ -41,7 +42,7 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
         not any(required_subject_shift == shift for shift in request.shifts) or
         not any(required_subject_semester == semester for semester in request.semesters)
       ):
-        courses = courses + courses_service.get_courses_by_subject(
+        courses = courses + course_service.get_courses_by_subject(
           sequence=required_subject_sequence,
           subject=required_subject,
           shifts=[required_subject_shift]
@@ -62,7 +63,7 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
         not any(extra_subject_shift == shift for shift in request.shifts) or
         not any(extra_subject_semester == semester for semester in request.semesters)
       ):
-        courses = courses + courses_service.get_courses_by_subject(
+        courses = courses + course_service.get_courses_by_subject(
           subject=extra_subject,
           level=extra_subject_level,
           career=extra_subject_career,
@@ -71,7 +72,7 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
         )
   
   print(f'Número de cursos sin filtrar: {len(courses)}')
-  courses = courses_service.filter_coruses(
+  courses = course_service.filter_coruses(
       courses,
       request.start_time,
       request.end_time,
@@ -81,7 +82,7 @@ async   def generate_schedules(request: ScheduleGeneratorRequest):
   print(f'Número de cursos después de filtrar {len(courses)}')
   
   print('Geneerado horarios...')
-  schedules = schedules_service.generate_schedules(
+  schedules = schedule_service.generate_schedules(
       courses=courses,
       n = request.length,
       required_subjects=[required_subject[1] for required_subject in request.required_subjects]

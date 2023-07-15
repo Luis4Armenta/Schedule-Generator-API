@@ -1,21 +1,22 @@
-from lxml import etree
-from bs4 import BeautifulSoup
 from typing import Optional, List
 
-from services.teacher import TeacherService
+from lxml import etree
+from bs4 import BeautifulSoup
 
 from models.course import Course, session, ScheduleCourse
 
 from repositories.courses_repository import CourseRepository
 from repositories.teachers_repository import TeacherRepository
 
-from utils.text import generate_regex, clean_name
+from services.teacher import TeacherService
+
+from utils.text import clean_name
 
 
-class CoursesService:
+class CourseService:
   def __init__(self, course_repository: CourseRepository, teacher_service: TeacherService):
     self.course_repository = course_repository
-    self.teacher_repository = teacher_service
+    self.teacher_service = teacher_service
   
   def filter_coruses(
     self,
@@ -25,7 +26,6 @@ class CoursesService:
     excluded_teachers: List[str] = [],
     excluded_subjects: List[str] = []
   ) -> List[Course]:
-    excluded_teachers = [clean_name(unwanted_teacher) for unwanted_teacher in excluded_teachers]
     excluded_subjects = [clean_name(excluded_subject) for excluded_subject in excluded_subjects]
 
     filtered_courses: List[Course] = []
@@ -82,7 +82,7 @@ class CoursesService:
       schedule_course['thursday'] = sessions[3]
       schedule_course['friday'] = sessions[4]
       
-      teacher = self.teacher_repository.get_teacher(teacher_name)
+      teacher = self.teacher_service.get_teacher(teacher_name)
       
       popularity: float = 0.0
       if teacher:
@@ -112,7 +112,7 @@ class CoursesService:
 
   def upload_courses(self, courses: List[Course]):
     for course in courses:
-      teacher = self.teacher_repository.get_teacher(course.teacher)
+      teacher = self.teacher_service.get_teacher(course.teacher)
       
       popularity: float = 0.0
       if teacher:

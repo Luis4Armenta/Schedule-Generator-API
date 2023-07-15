@@ -1,7 +1,6 @@
-import uuid
+from bson import ObjectId
 from pydantic import BaseModel, Field
 from typing import List, TypedDict, Optional
-from bson import ObjectId
 
 
 class PyObjectId(ObjectId):

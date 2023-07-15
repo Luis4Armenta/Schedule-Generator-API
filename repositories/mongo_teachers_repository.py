@@ -1,8 +1,10 @@
-from models.teacher import Teacher
-from models.teacher import Teacher
-from repositories.teachers_repository import TeacherRepository
-from typing import Any, TypedDict, Optional
 from pymongo import MongoClient
+from typing import TypedDict, Optional
+
+from models.teacher import Teacher
+from models.teacher import Teacher
+
+from repositories.teachers_repository import TeacherRepository
 
 
 def singleton(cls):

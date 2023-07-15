@@ -3,10 +3,10 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
+from services.scraper import BS4WebScraper
+from services.teacher import TeacherService
 from services.evaluator.evaluator import TeacherEvaluator
 from services.evaluator.azure_evaluator import AzureEvaluator
-from services.teacher import TeacherService
-from services.scraper import BS4WebScraper
 
 router = APIRouter()
 

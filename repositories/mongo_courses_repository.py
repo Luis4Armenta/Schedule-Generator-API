@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from typing import Any, TypedDict, Optional, List
+from typing import TypedDict, List
 
 from models.course import Course
 
@@ -71,9 +71,6 @@ class MongoCourseRepository(CourseRepository):
       upsert=True
     )
   
-  def add_course(self, course: Course) -> None:    
-    teacher_id = self.course_collection.insert_one(course.dict())
-
   def disconnect(self) -> None:
     self.mongo_client.close()
     

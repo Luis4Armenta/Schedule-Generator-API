@@ -1,5 +1,6 @@
 from typing import Optional
 from abc import ABC, abstractmethod
+
 from models.teacher import Teacher
 
 class TeacherRepository(ABC):

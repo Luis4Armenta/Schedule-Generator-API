@@ -22,8 +22,8 @@ class WebScraper(ABC):
   # dislikes: './/a[@rel="nolike"]//span/text()' 
 
 class BS4WebScraper(WebScraper):
-  def __init__(self, polarity_evaluator: TeacherEvaluator):
-    self.polarity_evaluator = polarity_evaluator
+  def __init__(self, teacher_evaluator: TeacherEvaluator):
+    self.teacher_evaluator = teacher_evaluator
   
   def find_teacher(self, name: str) -> Optional[Teacher]:
     if name == 'SIN ASIGNAR':
@@ -66,7 +66,7 @@ class BS4WebScraper(WebScraper):
         likes: int = int(raw_comment.xpath('.//a[@rel="like"]//span/text()')[0])
         dislikes: int = int(raw_comment.xpath('.//a[@rel="nolike"]//span/text()')[0])
         date: str = raw_comment.xpath('.//p[@class="fecha"]/text()')[0]
-        polarity: float = self.polarity_evaluator.get_polarity(text)
+        polarity: float = self.teacher_evaluator.get_polarity(text)
         
         polarities.append((polarity+1)/2)
         

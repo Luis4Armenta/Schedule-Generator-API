@@ -1,18 +1,15 @@
-import functools
-from typing import List
-from models.course import Course
-from models.schedule import Schedule
-from services.teacher import TeacherService
-from repositories.mongo_teachers_repository import MongoTeachersRepository
-from services.scraper import BS4WebScraper
-from services.evaluator.text_blob_evaluator import TextBlobEvaluator
-from services.translator import GoogleTranslator
-from services.evaluator.azure_evaluator import AzureEvaluator
 from statistics import mean, median
 
-class SchedulesService:
+from typing import List
+
+from models.course import Course
+from models.schedule import Schedule
+
+from services.teacher import TeacherService
+
+class ScheduleService:
   def __init__(self, teacher_service: TeacherService):
-    self._teachers_service = teacher_service
+    self.teacher_service = teacher_service
   
   def select_a_course(self, courses: List[Course], selected_course: Course) -> List[Course]:
     filtered_courses: List[Course] = []
