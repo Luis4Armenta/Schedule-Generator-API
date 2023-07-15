@@ -18,12 +18,23 @@ class CoursesService:
     courses: List[Course],
     start_time: Optional[str],
     end_time: Optional[str],
-    unwanted_teachers: List[str] = []
+    excluded_teachers: List[str] = [],
+    excluded_subjects: List[str] = []
   ) -> List[Course]:
-    unwanted_teachers = [clean_name(unwanted_teacher) for unwanted_teacher in unwanted_teachers]
+    excluded_teachers = [clean_name(unwanted_teacher) for unwanted_teacher in excluded_teachers]
+    excluded_subjects = [clean_name(excluded_subject) for excluded_subject in excluded_subjects]
+
     filtered_courses: List[Course] = []
     
     for course in courses:
+      # excluding teachers
+      if clean_name(course.teacher) in excluded_teachers:
+        continue
+      
+      # excluding subjects
+      if clean_name(course.subject) in excluded_subjects:
+        continue
+      
       # filter courses by time
       if start_time or end_time:
         start_time = start_time if start_time else '07:00'
@@ -42,8 +53,7 @@ class CoursesService:
         if out_time:
           continue
             
-      if clean_name(course.teacher) in unwanted_teachers:
-        continue
+      
       
       filtered_courses.append(course)
     return filtered_courses
@@ -128,7 +138,7 @@ class CoursesService:
     return self.course_repository.get_courses(query)
   
 
-def generate_regex(levels, career, shifts, semesters):
+def generate_regex(levels: List[str], career, shifts: List[str], semesters: List[str]):
     level_regex = '|'.join(levels)
     career_regex = re.escape(career)
     shift_regex = '|'.join(shifts)
