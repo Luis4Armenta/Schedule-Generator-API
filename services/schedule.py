@@ -40,50 +40,59 @@ class SchedulesService:
         filtered_courses.append(course)
         
     return filtered_courses
-  
-  def generate_schedules(self, courses: List[Course], n: int) -> List[Schedule]:
+
+  def generate_schedules(self, courses: List[Course], n: int, static_courses: List[Course] = []) -> List[Schedule]:
     def backtrack(schedule: List[Course], start_index: int):
-        if len(schedule) == n:
-
-            teachers_polarity: List[float] = []
-
-            for course in schedule:
-              teachers_polarity.append(course.teacher_popularity)
-              
-            schedule_result = Schedule(
-              popularity=median(teachers_polarity),
-              courses = schedule,
-            )
-              
-            schedules.append(schedule_result)
-            
-            return
+      # Verificar si se ha alcanzado el tamaño objetivo del horario
+      if len(schedule) == n:
+        # Calcular la polaridad promedio de los profesores en el horario
+        teachers_polarity: List[float] = []
+        for course in schedule:
+          teachers_polarity.append(course.teacher_popularity)
         
-        for i in range(start_index, len(courses)):
-            if is_valid(schedule, courses[i]):
-                schedule.append(courses[i])
-                backtrack(schedule, i + 1)
-                schedule.pop()
-    
-    # @functools.lru_cache(maxsize=None)
+        schedule_result = Schedule(
+          popularity=median(teachers_polarity),
+          courses=schedule,
+        )
+        schedules.append(schedule_result)
+        return
+
+      # Si hay cursos prioritarios, se agregan primero
+      if static_courses:
+        for curso_prioritario in static_courses:
+          if is_valid(schedule, curso_prioritario):
+            schedule.append(curso_prioritario)
+            backtrack(schedule, start_index)
+            schedule.pop()
+      
+      # Iterar sobre los cursos regulares, comenzando desde el índice de inicio
+      for i in range(start_index, len(courses)):
+        if is_valid(schedule, courses[i]):
+          schedule.append(courses[i])
+          backtrack(schedule, i + 1)
+          schedule.pop()
+
+    # Verificar si un curso es válido para agregar al horario actual
     def is_valid(schedule: List[Course], course: Course) -> bool:
-        for existing_course in schedule:
-            if has_overlap(existing_course, course) or existing_course.subject == course.subject:
-                return False
-        return True
-    
+      for existing_course in schedule:
+        if has_overlap(existing_course, course) or existing_course.subject == course.subject:
+          return False
+      return True
+
+    # Verificar si dos cursos tienen superposición en su horario
     def has_overlap(course1: Course, course2: Course) -> bool:
-        for day, session1 in course1.schedule.items():
-            session2 = course2.schedule.get(day)
-            if session1 and session2:
-                session1_start, session1_end = session1
-                session2_start, session2_end = session2
-                if not (session1_end <= session2_start or session1_start >= session2_end):
-                    return True
-        return False
-    
-    # schedules = []
-    schedules = []
-    backtrack([], 0)
+      for day, session1 in course1.schedule.items():
+        session2 = course2.schedule.get(day)
+        if session1 and session2:
+          session1_start, session1_end = session1
+          session2_start, session2_end = session2
+
+          if not (session1_end <= session2_start or session1_start >= session2_end):
+            return True
+      return False
+
+    schedules = []  # Lista para almacenar los horarios generados
+    backtrack([], 0)  # Iniciar la generación de horarios desde un horario vacío y el índice de inicio 0
     return schedules
+
     
