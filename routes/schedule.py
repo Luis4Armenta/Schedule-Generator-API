@@ -10,14 +10,14 @@ from services.scraper import BS4WebScraper
 from services.courses import CourseService
 from services.teacher import TeacherService
 from services.schedule import ScheduleService
-from services.evaluator.azure_evaluator import AzureEvaluator
+from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
 @router.get('/schedules/', tags=['Schedules'])
 async   def generate_schedules(request: ScheduleGeneratorRequest):
   start = time.time()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureEvaluator()))
+  teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
   course_service = CourseService(router.courses, teacher_service)
   schedule_service = ScheduleService(teacher_service)
 

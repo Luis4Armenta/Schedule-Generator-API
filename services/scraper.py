@@ -1,13 +1,18 @@
-import bs4
-import requests
 from abc import ABC
-from lxml import etree
-from statistics import mean
-from typing import Optional
 from requests import Response
 from typing import Optional, List
+from statistics import mean, stdev
+
+import bs4
+import requests
+from lxml import etree
+
 from models.teacher import Teacher, Comment
-from services.evaluator.evaluator import TeacherEvaluator
+
+from services.text_analyzer.text_analyzer import TextAnalyzer
+
+from utils.text import get_url_for_teacher
+from utils.metrics import get_positive_score
 
 class WebScraper(ABC):
   def find_teacher(self, name: str) -> Optional[Teacher]:
@@ -22,8 +27,8 @@ class WebScraper(ABC):
   # dislikes: './/a[@rel="nolike"]//span/text()' 
 
 class BS4WebScraper(WebScraper):
-  def __init__(self, teacher_evaluator: TeacherEvaluator):
-    self.teacher_evaluator = teacher_evaluator
+  def __init__(self, text_analyzer: TextAnalyzer):
+    self.text_analyzer = text_analyzer
   
   def find_teacher(self, name: str) -> Optional[Teacher]:
     if name == 'SIN ASIGNAR':
@@ -32,11 +37,11 @@ class BS4WebScraper(WebScraper):
         name='SIN ASIGNAR',
         comments=[],
         subjects=[],
-        polarity=0.5,
+        positive_score=0.5,
         url='https://foroupiicsa.net/diccionario/'
       )
     
-    url = self._get_url_for_teacher(name.upper())
+    url = self.get_url_for_teacher(name.upper())
     response: Response = requests.get(url)
     response.raise_for_status()
 
@@ -55,27 +60,33 @@ class BS4WebScraper(WebScraper):
         return None
 
 
-      polarities: List[float] = []
+      positive_scores: List[float] = []
       comments: List[Comment] = []
       
       
       raw_comments = dom.xpath('//div[@class="p-4 box-profe bordeiz"]')
       
       for raw_comment in raw_comments:
+        subject: str = raw_comment.xpath('.//span[@class="bluetx negritas"]/text()')[0]
         text: str = raw_comment.xpath('.//p[@class="comentario"]/text()')[0]
         likes: int = int(raw_comment.xpath('.//a[@rel="like"]//span/text()')[0])
         dislikes: int = int(raw_comment.xpath('.//a[@rel="nolike"]//span/text()')[0])
         date: str = raw_comment.xpath('.//p[@class="fecha"]/text()')[0]
-        polarity: float = self.teacher_evaluator.get_polarity(text)
         
-        polarities.append(polarity)
+        positive_score, negative_score, neutral_score= self.text_analyzer.analyze_sentiment(text)
+        
+        neutral_score_rate = 0.85
+        positive_scores.append(positive_score + (neutral_score * neutral_score_rate))
         
         comment: Comment = {
+          'subject': subject,
           'text': text,
           'likes': likes,
           'dislikes': dislikes,
           'date': date,
-          'polarity': polarity
+          'positive_score': positive_score,
+          'neutral_score': neutral_score,
+          'negative_score': negative_score,
         }
         
         comments.append(comment)
@@ -87,16 +98,11 @@ class BS4WebScraper(WebScraper):
         url=url,
         subjects=subjects,
         comments=comments,
-        polarity=mean(polarities)
+        positive_score=get_positive_score(positive_scores)
       )
       
       return teacher
     else:
       return None
-    
 
-  def _get_url_for_teacher(self, teacher: str) -> str:
-    parsed_name: str = teacher.replace(' ', '+')
-    
-    url = f'https://foroupiicsa.net/diccionario/buscar/{parsed_name}'
-    return url
+

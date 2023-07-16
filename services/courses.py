@@ -86,7 +86,7 @@ class CourseService:
       
       popularity: float = 0.0
       if teacher:
-        popularity = teacher.polarity
+        popularity = teacher.positive_score
       else:
         popularity = 0.5
         
@@ -116,7 +116,7 @@ class CourseService:
       
       popularity: float = 0.0
       if teacher:
-        popularity = teacher.polarity
+        popularity = teacher.positive_score
       else:
         popularity = 0.5
       

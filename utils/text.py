@@ -21,3 +21,10 @@ def generate_regex(levels: List[str], career: str, shifts: List[str], semesters:
   
   regex_pattern = r'^[' + level_regex + r'][' + career_regex + r'][' + shift_regex + r'][' + semester_regex + r'][0-9]+$'
   return regex_pattern
+
+def get_url_for_teacher(teacher: str) -> str:
+  parsed_name = clean_name(teacher)
+  parsed_name: str = teacher.replace(' ', '+')
+  
+  url = f'https://foroupiicsa.net/diccionario/buscar/{parsed_name}'
+  return url

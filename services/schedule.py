@@ -51,12 +51,12 @@ class ScheduleService:
         
         if all(required_subject in schedule_subjects for required_subject in required_subjects):
           # Calcular la polaridad promedio de los profesores en el horario
-          teachers_polarity: List[float] = []
+          teachers_positive_score: List[float] = []
           for course in schedule:
-            teachers_polarity.append(course.teacher_popularity)
+            teachers_positive_score.append(course.teacher_popularity)
           
           schedule_result = Schedule(
-            popularity=mean(teachers_polarity),
+            popularity=mean(teachers_positive_score),
             courses=schedule,
           )
           schedules.append(schedule_result)

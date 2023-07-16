@@ -19,11 +19,14 @@ class PyObjectId(ObjectId):
     field_schema.update(type="string")
 
 class Comment(TypedDict):
+  subject: str
   text: str
   date: str
   likes: int
   dislikes: int
-  polarity: float
+  positive_score: Optional[float]
+  neutral_score: Optional[float]
+  negative_score: Optional[float]
   
 
 class Teacher(BaseModel):
@@ -31,7 +34,7 @@ class Teacher(BaseModel):
   name: str = Field(...)
   url: str = Field(...)
   subjects: List[str] = Field(...)
-  polarity: float = Field(...)
+  positive_score: float = Field(...)
   comments: List[Comment] = Field(...)
   
   class Config:
@@ -48,8 +51,10 @@ class Teacher(BaseModel):
             "date": "21-11-2019",
             "likes": 5,
             "dislikes": 0,
-            "polarity": 0.5
+            "positive_score": 0.5,
+            "neutral_score": 0.3,
+            "negative_score": 0.2
           }],
-          "polarity": 0.22
+          "positive_score": 0.22
         }
     }

@@ -47,7 +47,7 @@ class MongoTeachersRepository(TeacherRepository):
         url=teacher['url'],
         subjects=subjects,
         comments=teacher['comments'],
-        polarity=teacher['polarity']
+        positive_score=teacher['polarity']
       )
     else:
       return None

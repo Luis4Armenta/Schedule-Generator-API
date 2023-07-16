@@ -10,14 +10,14 @@ from schemas.schedule import CoursesRequest
 from services.courses import CourseService
 from services.teacher import TeacherService
 from services.scraper import BS4WebScraper
-from services.evaluator.evaluator import TeacherEvaluator
-from services.evaluator.azure_evaluator import AzureEvaluator
+from services.text_analyzer.text_analyzer import TextAnalyzer
+from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
 @router.post('/courses/', tags=['Courses'])
 async def upload_schedules(file: UploadFile):
-  teacher_evaluator: TeacherEvaluator = AzureEvaluator()
+  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)
   
@@ -28,7 +28,7 @@ async def upload_schedules(file: UploadFile):
 
 @router.get('/courses/', tags=['Courses'])
 def get_courses(request: CoursesRequest):
-  teacher_evaluator: TeacherEvaluator = AzureEvaluator()
+  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)
   

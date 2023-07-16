@@ -24,7 +24,7 @@ class TeacherService:
         name='SIN ASIGNAR',
         comments=[],
         subjects=[],
-        polarity=0.5,
+        positive_score=0.5,
         url='https://foroupiicsa.net/diccionario/'
       )
     
