@@ -18,12 +18,6 @@ class Course(BaseModel):
   subject: str
   teacher_popularity: Optional[float]
   
-  level: str
-  career:str
-  shift: str
-  semester: str
-  consecutive: str
-  
   schedule: ScheduleCourse
   
 class Schedule(BaseModel):
