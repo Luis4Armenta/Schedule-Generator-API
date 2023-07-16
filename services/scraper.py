@@ -1,7 +1,6 @@
 from abc import ABC
 from requests import Response
-from typing import Optional, List
-from statistics import mean, stdev
+from typing import Optional, List, Tuple
 
 import bs4
 import requests
@@ -41,7 +40,7 @@ class BS4WebScraper(WebScraper):
         url='https://foroupiicsa.net/diccionario/'
       )
     
-    url = self.get_url_for_teacher(name.upper())
+    url = get_url_for_teacher(name.upper())
     response: Response = requests.get(url)
     response.raise_for_status()
 
@@ -66,17 +65,18 @@ class BS4WebScraper(WebScraper):
       
       raw_comments = dom.xpath('//div[@class="p-4 box-profe bordeiz"]')
       
-      for raw_comment in raw_comments:
+      texts: List[str] = dom.xpath('//p[@class="comentario"]/text()') 
+      scores: List[Tuple[float, float, float]] = self.text_analyzer.analyze_sentiment_by_block(texts)
+      
+      for raw_comment, score in zip(raw_comments, scores):
         subject: str = raw_comment.xpath('.//span[@class="bluetx negritas"]/text()')[0]
         text: str = raw_comment.xpath('.//p[@class="comentario"]/text()')[0]
         likes: int = int(raw_comment.xpath('.//a[@rel="like"]//span/text()')[0])
         dislikes: int = int(raw_comment.xpath('.//a[@rel="nolike"]//span/text()')[0])
         date: str = raw_comment.xpath('.//p[@class="fecha"]/text()')[0]
-        
-        positive_score, negative_score, neutral_score= self.text_analyzer.analyze_sentiment(text)
-        
+
         neutral_score_rate = 0.85
-        positive_scores.append(positive_score + (neutral_score * neutral_score_rate))
+        positive_scores.append(score[0] + (score[1] * neutral_score_rate))
         
         comment: Comment = {
           'subject': subject,
@@ -84,9 +84,9 @@ class BS4WebScraper(WebScraper):
           'likes': likes,
           'dislikes': dislikes,
           'date': date,
-          'positive_score': positive_score,
-          'neutral_score': neutral_score,
-          'negative_score': negative_score,
+          'positive_score': score[0],
+          'neutral_score': score[1],
+          'negative_score': score[2],
         }
         
         comments.append(comment)

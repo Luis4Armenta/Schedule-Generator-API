@@ -1,4 +1,4 @@
-from statistics import mean, median
+from statistics import mean
 
 from typing import List
 

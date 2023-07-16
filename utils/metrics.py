@@ -2,6 +2,9 @@ from typing import List
 from statistics import mean, stdev
 
 def get_positive_score(positive_scores: List[float]) -> float:
+  if len(positive_scores) < 2:
+    return positive_scores[0]
+  
   m = mean(positive_scores)
   std = stdev(positive_scores)
   
