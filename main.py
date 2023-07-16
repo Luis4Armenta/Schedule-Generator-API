@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dotenv import dotenv_values
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from routes.course import router as course_router
 from routes.teacher import router as teacher_router
@@ -41,7 +42,15 @@ def startup_db_clients():
   course_router.courses = app.courses  
   schedule_router.courses = app.courses  
 
+origins = ["*"]
 
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=origins,
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 app.include_router(teacher_router)
 app.include_router(course_router)
