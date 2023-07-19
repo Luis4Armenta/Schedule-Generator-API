@@ -1,5 +1,5 @@
 from bson import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 from typing import List, TypedDict, Optional
 
 
@@ -18,24 +18,24 @@ class PyObjectId(ObjectId):
   def __modify_schema__(cls, field_schema):
     field_schema.update(type="string")
 
-class Comment(TypedDict):
-  subject: str
-  text: str
-  date: str
-  likes: int
-  dislikes: int
-  positive_score: Optional[float]
-  neutral_score: Optional[float]
-  negative_score: Optional[float]
+class Comment(BaseModel):
+  subject: str = Field(title="Nombre de la asignatura")
+  text: str = Field(title="Comentario")
+  date: str = Field(title="Fecha de publicación")
+  likes: int = Field(title="Número de likes", ge=0)
+  dislikes: int = Field(title='Número de dislikes', ge=0)
+  positive_score: Optional[float] = Field(title="Puntuación positiva", description="Sentimiento positivo percibido en el comentario por el sistema.")
+  neutral_score: Optional[float] = Field(title="Puntuación neutra", description="Sentimiento neutro percibido en el comentario por el sistema.")
+  negative_score: Optional[float] = Field(title="Puntuación negativa", description="Sentimiento negativo percibido en el comentario por el sistema.")
   
 
 class Teacher(BaseModel):
   id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias='_id')
-  name: str = Field(...)
-  url: str = Field(...)
-  subjects: List[str] = Field(...)
-  positive_score: float = Field(...)
-  comments: List[Comment] = Field(...)
+  name: str = Field(title="Nombre del profesor")
+  url: HttpUrl = Field(title="Perfil del profesor", description="Url a (diccionario de maestros) de donde se extrajeron los datos")
+  subjects: List[str] = Field(title="Asignaturas", description="Asignaturas que imparte el profesor")
+  positive_score: float = Field(title="Puntuación positiva", description="Opinion promedio a 3 desviaciones estándar en el diccionario de profesores")
+  comments: List[Comment] = Field(title="Comentarios", description="Comentarios extraídos del diccionario de maestros.")
   
   class Config:
     allow_population_by_field_name = True

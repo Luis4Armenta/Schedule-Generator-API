@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Query
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -11,7 +13,18 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 router = APIRouter()
 
 @router.get('/teachers/', tags=['Teachers'])
-def get_teacher_by_name(teacher_name: str = Query(min_length=5)):
+def get_teacher_by_name(
+    teacher_name: Annotated[
+        str,
+        Query(
+          min_length=5,
+          max_length=50,
+          pattern='^[A-Za-zÁ-Úá-ú]+ [A-Za-zÁ-Úá-ú]+ [A-Za-zÁ-Úá-ú]+$',
+          title='Nombre del profesor',
+          description='Nombre del profesor que se desea buscar.'
+          )
+      ]
+  ):
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   teacher = teacher_service.get_teacher(teacher_name)
