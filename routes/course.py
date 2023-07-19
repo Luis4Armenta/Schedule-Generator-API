@@ -15,7 +15,11 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.post('/courses/')
+@router.post(
+    '/courses/',
+    summary='Subir horarios de clases',
+    description='Sube diferentes horarios de clases mediante un archivo html del SAES para proveer de cursos la aplicación.'
+)
 async def upload_schedules(
   file: Annotated[
       UploadFile,
@@ -34,7 +38,11 @@ async def upload_schedules(
   
   return JSONResponse(content={"message": "Schedules uploaded!"}, status_code=202)
 
-@router.get('/courses/')
+@router.get(
+  '/courses/',
+  summary='Obtener cursos',
+  description='Obten una lista de cursos que cumplan con los parámetros dados.'
+)
 def get_courses(request: CoursesRequest) -> List[Course]:
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))

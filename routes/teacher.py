@@ -14,7 +14,11 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.get('/teachers/')
+@router.get(
+  '/teachers/',
+  summary='Obtener profesor',
+  description='Ve la información disponible de un profesor dando su nombre.'
+)
 def get_teacher_by_name(
     teacher_name: Annotated[
         str,

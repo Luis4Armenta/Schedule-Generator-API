@@ -15,7 +15,11 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.get('/schedules/')
+@router.get(
+  '/schedules/',
+  summary='Generar horarios',
+  description='Apartir de los parámetros dados genera una colección de horarios que cumplan con ellos.',
+)
 async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule]:
   start = time.time()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
