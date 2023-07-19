@@ -11,6 +11,8 @@ from repositories.teachers_repository import TeacherRepository
 from repositories.mongo_teachers_repository import MongoTeachersRepository
 from repositories.mongo_courses_repository import MongoCourseRepository
 
+from utils.enums import Tags
+
 config = dotenv_values('.env')
 
 app = FastAPI()
@@ -52,9 +54,9 @@ app.add_middleware(
   allow_headers=["*"],
 )
 
-app.include_router(teacher_router)
-app.include_router(course_router)
-app.include_router(schedule_router)
+app.include_router(teacher_router, tags=[Tags.teachers])
+app.include_router(course_router, tags=[Tags.courses])
+app.include_router(schedule_router, tags=[Tags.schedules])
 
 
 

@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Annotated
 
 from fastapi import APIRouter
-from fastapi import UploadFile
+from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
 
 from models.course import Course
@@ -15,8 +15,16 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.post('/courses/', tags=['Courses'])
-async def upload_schedules(file: UploadFile):
+@router.post('/courses/')
+async def upload_schedules(
+  file: Annotated[
+      UploadFile,
+      File(
+        title="Horarios de clases", 
+        description="Documento .html del horario de clases con los cursos a cargar (Se puede encontrar en la sección 'Horarios de clases' en la pestaña de 'Académia' del SAES)."
+      )
+    ]
+  ):
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)
@@ -26,8 +34,8 @@ async def upload_schedules(file: UploadFile):
   
   return JSONResponse(content={"message": "Schedules uploaded!"}, status_code=202)
 
-@router.get('/courses/', tags=['Courses'])
-def get_courses(request: CoursesRequest):
+@router.get('/courses/')
+def get_courses(request: CoursesRequest) -> List[Course]:
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)

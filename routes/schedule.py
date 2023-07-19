@@ -4,6 +4,7 @@ from typing import List
 from fastapi import APIRouter
 
 from models.course import Course
+from models.schedule import Schedule
 from schemas.schedule import ScheduleGeneratorRequest
 
 from services.scraper import BS4WebScraper
@@ -14,8 +15,8 @@ from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.get('/schedules/', tags=['Schedules'])
-async   def generate_schedules(request: ScheduleGeneratorRequest):
+@router.get('/schedules/')
+async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule]:
   start = time.time()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
   course_service = CourseService(router.courses, teacher_service)
