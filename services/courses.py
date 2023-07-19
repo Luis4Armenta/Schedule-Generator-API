@@ -97,12 +97,6 @@ class CourseService:
         subject=raw_course.xpath('./td/text()')[1],
         teacher=teacher_name,
         schedule=schedule_course,
-
-        level=sequence[0],
-        career=sequence[1],
-        shift=sequence[2],
-        semester=sequence[3],
-        consecutive=sequence[4],
         teacher_popularity=popularity
       )
 
@@ -146,7 +140,6 @@ class CourseService:
     ) -> List[Course]:
     level = sequence[0]
     career = sequence[1]
-    shifts = shifts,
     semester = sequence[3]
     
     return self.course_repository.get_courses(
