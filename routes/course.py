@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from models.course import Course
 from schemas.schedule import CoursesRequest
 
-from services.courses import CourseService
+from services.course import CourseService
 from services.teacher import TeacherService
 from services.scraper import BS4WebScraper
 from services.text_analyzer.text_analyzer import TextAnalyzer

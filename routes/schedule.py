@@ -7,7 +7,7 @@ from models.course import Course
 from schemas.schedule import ScheduleGeneratorRequest
 
 from services.scraper import BS4WebScraper
-from services.courses import CourseService
+from services.course import CourseService
 from services.teacher import TeacherService
 from services.schedule import ScheduleService
 from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
