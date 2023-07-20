@@ -18,9 +18,24 @@ router = APIRouter()
 @router.get(
   '/schedules/',
   summary='Generar horarios',
-  description='Apartir de los parámetros dados genera una colección de horarios que cumplan con ellos.',
+  response_description="Una lista ordenada de 20 horarios generados de mejor puntuados a peor puntuados."
 )
 async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule]:
+  '''
+  Apartir de los parámetros dados genera una colección de horarios que cumplan con ellos.
+  
+  - **career**: letra asignada a la carrera para la que se generara el horario.
+  - **levels**: niveles de los cursos que se tendrán en cuenta para formar los horarios.
+  - **semesters**: semestres que se tendrán en cuenta para formar los horarios.
+  - **start_time**: hora apartir de la que iniciaran los horarios.
+  - **end_time**: hora máxima a la que finalizarán los horarios.
+  - **shifts**: turnos que podrán integrar los horarios.
+  - **length**: número de asignaturas con las que cumplicara cada horario.
+  - **excluded_teachers**: profesores que serán excluidos de los horarios generados.
+  - **excluded_subjects**: nombres de asignaturas que serán excluidas de los horarios generados.
+  - **required_subjects**: asginaturas que tienen que aparecen el los horarios obligatoriamente.
+  - **extra_subjects**: asignaturas opcionales que amplian el conjunto de asignaturas posibles en un horario.
+  '''
   start = time.time()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
   course_service = CourseService(router.courses, teacher_service)

@@ -17,6 +17,7 @@ router = APIRouter()
 @router.get(
   '/teachers/',
   summary='Obtener profesor',
+  response_description="Un profesor que coincide con el nombre dado.",
   description='Ve la información disponible de un profesor dando su nombre.'
 )
 def get_teacher_by_name(

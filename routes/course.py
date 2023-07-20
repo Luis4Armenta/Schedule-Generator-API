@@ -41,6 +41,7 @@ async def upload_schedules(
 @router.get(
   '/courses/',
   summary='Obtener cursos',
+  response_description="Una lista de cursos se encuentran dentro de los parámetros dados.",
   description='Obten una lista de cursos que cumplan con los parámetros dados.'
 )
 def get_courses(request: CoursesRequest) -> List[Course]:
