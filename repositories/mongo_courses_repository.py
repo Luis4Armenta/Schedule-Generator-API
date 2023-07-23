@@ -70,6 +70,18 @@ class MongoCourseRepository(CourseRepository):
       },
       upsert=True
     )
+    
+  def update_course_availability(self, sequence: str, subject: str, new_course_availability: int):
+    course = self.course_collection.find_one({
+      'sequence': sequence,
+      'subject': subject
+    })
+    
+    if course:
+      self.course_collection.update_one(
+        {'_id': course['_id']},
+        {'$set': {'course_availability': new_course_availability}}
+      )
   
   def disconnect(self) -> None:
     self.mongo_client.close()

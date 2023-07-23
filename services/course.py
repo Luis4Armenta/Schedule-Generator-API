@@ -3,7 +3,7 @@ from typing import Optional, List
 from lxml import etree
 from bs4 import BeautifulSoup
 
-from models.course import Course, session, ScheduleCourse
+from models.course import Course, session, ScheduleCourse, CourseAvailability
 
 from repositories.courses_repository import CourseRepository
 from repositories.teachers_repository import TeacherRepository
@@ -104,6 +104,28 @@ class CourseService:
 
     return courses
 
+
+  def parse_availabilities(self, document) -> List[CourseAvailability]:
+    availabilities: List[CourseAvailability] = []
+    
+    dom = etree.HTML(str(BeautifulSoup(document, 'html.parser', from_encoding='utf8')))
+    raw_courses = dom.xpath('//table[@id="ctl00_mainCopy_GrvOcupabilidad"]//tr')[1:]
+    
+    for raw_course in raw_courses:
+      sequence: str = raw_course.xpath('./td/text()')[0].strip().upper()
+      subject: str = raw_course.xpath('./td/text()')[2].strip().upper()
+      course_avalibility = int(raw_course.xpath('./td/text()')[6].strip())
+    
+    
+      a = CourseAvailability(
+        sequence=sequence,
+        subject=subject,
+        course_availability=course_avalibility
+      )
+      availabilities.append(a)
+      
+    return availabilities
+
   def upload_courses(self, courses: List[Course]):
     for course in courses:
       teacher = self.teacher_service.get_teacher(course.teacher)
@@ -149,6 +171,17 @@ class CourseService:
       semesters=[semester],
       subjects=[subject]
     )
+  
+  def update_course_availability(
+    self,
+    availabilities: List[CourseAvailability]
+  ) -> None:
+    for avalability in availabilities:
+      self.course_repository.update_course_availability(
+        sequence=avalability.sequence,
+        subject=avalability.subject,
+        new_course_availability=avalability.course_availability
+      )
 
 
 def get_sessions(raw_course) -> session:

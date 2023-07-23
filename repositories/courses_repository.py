@@ -20,6 +20,15 @@ class CourseRepository(ABC):
     pass
   
   @abstractmethod
+  def update_course_availability(
+    self,
+    sequence: str,
+    subject: str,
+    new_course_availability: int
+  ) -> None:
+    pass
+  
+  @abstractmethod
   def add_course_if_not_exist(self, course: Course) -> None:
     pass
   
