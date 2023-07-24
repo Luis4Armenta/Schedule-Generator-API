@@ -9,8 +9,8 @@ from repositories.courses_repository import CourseRepository
 from repositories.teachers_repository import TeacherRepository
 
 from services.teacher import TeacherService
-
-from utils.text import clean_name
+from services.course_filter.filter import CourseFilter, CourseChecker
+from services.course_filter.checkers import SubjectChecker, TeacherChecker, TimeChecker, AvailabilityChecker
 
 
 class CourseService:
@@ -23,45 +23,31 @@ class CourseService:
     courses: List[Course],
     start_time: Optional[str],
     end_time: Optional[str],
+    min_course_availability: int = 1,
     excluded_teachers: List[str] = [],
-    excluded_subjects: List[str] = []
+    excluded_subjects: List[str] = [],
   ) -> List[Course]:
-    excluded_subjects = [clean_name(excluded_subject) for excluded_subject in excluded_subjects]
-
-    filtered_courses: List[Course] = []
+    checkers: List[CourseChecker] = [
+      SubjectChecker(
+        excluded_subjects=excluded_subjects
+      ),
+      TeacherChecker(
+        excluded_teachers=excluded_teachers
+      ),
+      TimeChecker(
+        start_time=start_time,
+        end_time=end_time
+      ),
+      AvailabilityChecker(
+        min_availability=min_course_availability
+      )
+    ]
     
-    for course in courses:
-      # excluding teachers
-      if clean_name(course.teacher) in excluded_teachers:
-        continue
-      
-      # excluding subjects
-      if clean_name(course.subject) in excluded_subjects:
-        continue
-      
-      # filter courses by time
-      if start_time or end_time:
-        start_time = start_time if start_time else '07:00'
-        end_time = end_time if end_time else '22:00'
-        
-        out_time = False
-        
-        for _, session in course.schedule.items():
-          if session is not None:
-            session_start, session_end = session
-            
-            if session_start < start_time or session_end > end_time:
-              out_time = True
-              break
-        
-        if out_time:
-          continue
-            
-      
-      
-      filtered_courses.append(course)
-    return filtered_courses
-  
+    course_filter = CourseFilter(checkers)
+    
+    return course_filter.filter_courses(courses)
+    
+
   def parse_courses(self, document) -> List[Course]:
     courses: List[Course] = []
 

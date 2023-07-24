@@ -93,11 +93,12 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   
   print(f'Número de cursos sin filtrar: {len(courses)}')
   courses = course_service.filter_coruses(
-      courses,
-      request.start_time,
-      request.end_time,
-      request.excluded_teachers,
-      request.excluded_subjects
+      courses=courses,
+      start_time=request.start_time,
+      end_time=request.end_time,
+      excluded_teachers=request.excluded_teachers,
+      excluded_subjects=request.excluded_subjects,
+      min_course_availability=request.available_uses
     )
   print(f'Número de cursos después de filtrar {len(courses)}')
   

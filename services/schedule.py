@@ -44,8 +44,6 @@ class ScheduleService:
       n: int,
       required_subjects: List[str] = [],
     ) -> List[Schedule]:
-    courses = [course for course in courses if course.course_availability >= 1]
-
     def backtrack(schedule: List[Course], start_index: int):
       # Verificar si se ha alcanzado el tamaño objetivo del horario
       if len(schedule) == n:

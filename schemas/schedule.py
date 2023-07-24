@@ -58,6 +58,11 @@ class ScheduleGeneratorRequest(BaseModel):
     description="Número de asignaturas que formaran parte de cada horario generado.",
     gt=2, lt=12
   )
+  available_uses: int = Field(
+    title="Usos disponibles",
+    description="Número de lugares disponibles por curso.",
+    ge=0, le=40, default=1
+  )
   excluded_teachers: List[str] = Field(
     title="Profesores excluidos",
     description="Arreglo de nombres de profesores que no se tomaran en cuenta para formar parte de los horarios generados.",
