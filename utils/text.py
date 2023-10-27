@@ -16,7 +16,7 @@ def clean_name(name: str) -> str:
 def generate_regex(levels: List[str], career: str, shifts: List[str], semesters: List[str]):
   level_regex = '|'.join(levels)
   career_regex = re.escape(career)
-  shift_regex = '|'.join(["M", "V"])
+  shift_regex = '|'.join(shifts)
   semester_regex = '|'.join(semesters)
   
   regex_pattern = r'^[' + level_regex + r'][' + career_regex + r'][' + shift_regex + r'][' + semester_regex + r'][0-9]+$'
