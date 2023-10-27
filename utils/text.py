@@ -24,7 +24,7 @@ def generate_regex(levels: List[str], career: str, shifts: List[str], semesters:
 
 def get_url_for_teacher(teacher: str) -> str:
   parsed_name = clean_name(teacher)
-  parsed_name: str = teacher.replace(' ', '+')
+  parsed_name: str = parsed_name.replace(' ', '+')
   
   url = f'https://foroupiicsa.net/diccionario/buscar/{parsed_name}'
   return url
