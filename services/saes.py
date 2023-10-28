@@ -3,7 +3,8 @@ from abc import ABC
 from lxml import etree
 from bs4 import BeautifulSoup
 
-from models.course import Course, session, ScheduleCourse, CourseAvailability
+from models.course import Course, session, ScheduleCourse, CourseAvailability, Subject
+from repositories.subjects_repository import SubjectRepository
 from services.teacher import TeacherService
 from typing import List
 
@@ -13,7 +14,11 @@ class SAESService(ABC):
   
   
 class SaesService(SAESService):
-  def __init__(self, teacher_service: TeacherService):
+  def __init__(
+      self,
+      teacher_service: TeacherService,
+      # subject_repository: SubjectRepository
+    ):
     self.teacher_service = teacher_service
     
   def get_courses(self, document) -> List[Course]:
@@ -79,6 +84,39 @@ class SaesService(SAESService):
       
     return availabilities
   
+  def get_subjects(self, document) -> List[Subject]:
+    subjects: List[Subject] = []
+    
+    dom = etree.HTML(str(BeautifulSoup(document, 'html.parser', from_encoding='utf8')))
+    props = dom.xpath('//select/option[@selected="selected"]/@value')
+    raw_subjects = dom.xpath('//table[@id="ctl00_mainCopy_GridView1"]//tr')[1:]
+    
+    career: str = props[0]
+    plan: str = props[1]
+    
+    for raw_subject in raw_subjects:
+      fields = raw_subject.xpath('./td/text()')
+      
+      level: int = int(fields[0])
+      key: str = fields[1]
+      name: str = fields[2]
+      required: bool = True if fields[3].strip().upper() == 'OBLIGATORIA' else False
+      credits_required: float = float(fields[4])
+      
+      subject = Subject(
+        career=career,
+        plan=plan,
+        level=level,
+        key=key,
+        name=name,
+        required=required,
+        credits_required=credits_required
+      )
+      
+      subjects.append(subject)
+      
+    return subjects 
+    
 def get_sessions(raw_course) -> session:
   sessions: List[session] = []
   

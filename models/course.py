@@ -4,6 +4,15 @@ from pydantic import BaseModel, Field
 session = Optional[Tuple[str, str]]
 
 
+class Subject(BaseModel):
+  career: str
+  plan: str
+  level: int
+  key: str
+  name: str
+  required: bool
+  credits_required: float
+
 class ScheduleCourse(TypedDict):
   monday: session
   tuesday: session
