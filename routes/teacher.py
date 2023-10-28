@@ -5,12 +5,16 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from models.teacher import Teacher
+from teachers.domain.model.teacher import Teacher
 
-from services.scraper import BS4WebScraper
-from services.teacher import TeacherService
-from services.text_analyzer.text_analyzer import TextAnalyzer
-from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+# from services.scraper import BS4WebScraper
+# from services.teacher import TeacherService
+# from services.text_analyzer.text_analyzer import TextAnalyzer
+# from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
+from teachers.application.teacher import TeacherService
+from teachers.infrastructure.text_analyzer.text_analyzer import TextAnalyzer
+from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 

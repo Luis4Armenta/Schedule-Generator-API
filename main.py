@@ -6,12 +6,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.course import router as course_router
 from routes.teacher import router as teacher_router
 from routes.schedule import router as schedule_router
-from repositories.courses_repository import CourseRepository
-from repositories.teachers_repository import TeacherRepository
-from repositories.subjects_repository import SubjectRepository
-from repositories.mongo_teachers_repository import MongoTeachersRepository
-from repositories.mongo_courses_repository import MongoCourseRepository
-from repositories.mongo_subjects_repository import MongoSubjectsRepository
+from courses.domain.ports.courses_repository import CourseRepository
+from teachers.domain.ports.teachers_repository import TeacherRepository
+from subjects.domain.ports.subjects_repository import SubjectRepository
+from teachers.infrastructure.mongo_teachers_repository import MongoTeachersRepository
+from courses.infrastructure.mongo_courses_repository import MongoCourseRepository
+from subjects.infrastructure.mongo_subjects_repository import MongoSubjectsRepository
 
 from utils.enums import Tags
 

@@ -3,18 +3,16 @@ from typing import List
 
 from fastapi import APIRouter
 
-from models.course import Course
-from models.schedule import Schedule
+from courses.domain.model.course import Course
+from schedules.domain.model.schedule import Schedule
 from schemas.schedule import ScheduleGeneratorRequest
 
-from services.scraper import BS4WebScraper
-from services.course import CourseService
-from services.teacher import TeacherService
-from services.schedule import ScheduleService
-from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
-from services.subject import SubjectService
-from repositories.subjects_repository import SubjectRepository
-from repositories.mongo_subjects_repository import MongoSubjectsRepository
+from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
+from courses.application.course import CourseService
+from teachers.application.teacher import TeacherService
+from schedules.application.schedule import ScheduleService
+from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+from subjects.application.subject import SubjectService
 
 router = APIRouter()
 

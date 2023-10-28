@@ -4,18 +4,21 @@ from fastapi import APIRouter
 from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
 
-from models.course import Course, CourseAvailability, Subject
+from courses.domain.model.course import Course, CourseAvailability
+from subjects.domain.model.subject import Subject
 from schemas.schedule import CoursesRequest
 
-from services.course import CourseService
-from services.teacher import TeacherService
-from services.scraper import BS4WebScraper
-from services.text_analyzer.text_analyzer import TextAnalyzer
-from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
-from services.saes import SaesService
-from services.subject import SubjectService
-from repositories.subjects_repository import SubjectRepository
-from repositories.mongo_subjects_repository import MongoSubjectsRepository
+from courses.application.course import CourseService
+from teachers.application.teacher import TeacherService
+from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
+from teachers.infrastructure.text_analyzer.text_analyzer import TextAnalyzer
+from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+
+from subjects.domain.ports.subjects_repository import SubjectRepository
+from subjects.infrastructure.mongo_subjects_repository import MongoSubjectsRepository
+
+from subjects.application.subject import SubjectService
+from saes.application.saes import SaesService
 
 router = APIRouter()
 
