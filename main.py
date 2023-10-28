@@ -83,3 +83,4 @@ def message() -> HTMLResponse:
 def shutdown_db_clients():
   app.teachers.disconnect()
   app.courses.disconnect()
+  app.subjects.disconnect()
