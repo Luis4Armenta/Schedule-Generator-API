@@ -12,6 +12,7 @@ from services.teacher import TeacherService
 from services.scraper import BS4WebScraper
 from services.text_analyzer.text_analyzer import TextAnalyzer
 from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+from services.saes import SaesService
 
 router = APIRouter()
 
@@ -32,8 +33,9 @@ async def upload_schedules(
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)
+  saes_service = SaesService(teacher_service)
   
-  courses: List[Course] = course_service.parse_courses(await file.read())
+  courses: List[Course] = saes_service.get_courses(await file.read())
   course_service.upload_courses(courses)
   
   return JSONResponse(content={"message": "Schedules uploaded!"}, status_code=202)
@@ -55,8 +57,9 @@ async def upload_schedule_occupancy(
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   course_service = CourseService(router.courses, teacher_service)
+  saes_service = SaesService(teacher_service)
   
-  availabilities: List[CourseAvailability] = course_service.parse_availabilities(await file.read())
+  availabilities: List[CourseAvailability] = saes_service.get_course_availability(await file.read())
   course_service.update_course_availability(availabilities=availabilities)
   return availabilities
   
