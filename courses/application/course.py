@@ -53,7 +53,6 @@ class CourseService:
     for course in courses:
       teacher = self.teacher_service.get_teacher(course.teacher)
       sequence = course.sequence
-      print(sequence[1], course.subject)
       subject = self.subject_service.get_subject(sequence[1], course.subject)
       popularity: float = 0.0
       if teacher:
@@ -62,9 +61,6 @@ class CourseService:
         popularity = 0.5
       
       course.teacher_popularity = popularity
-      print("Nombre de la materia:", course.subject)
-      print("sequencia de la materia:", course.sequence)
-      print("subject:", subject)
       course.required_credits = subject.credits_required
       self.course_repository.add_course_if_not_exist(course)
   

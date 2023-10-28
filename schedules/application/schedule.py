@@ -30,7 +30,6 @@ class ScheduleService:
                     for course in schedule:
                         teachers_positive_score.append(
                             course.teacher_popularity)
-                        print(course)
                         credits_required = credits_required + course.required_credits
                     
                     if credits_required <= credits:

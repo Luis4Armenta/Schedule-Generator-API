@@ -91,7 +91,6 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
           shifts=[required_subject_shift]
         )
   
-  print(f'Número de cursos sin filtrar: {len(courses)}')
   courses = course_service.filter_coruses(
       courses=courses,
       start_time=request.start_time,
@@ -100,9 +99,7 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
       excluded_subjects=request.excluded_subjects,
       min_course_availability=request.available_uses
     )
-  print(f'Número de cursos después de filtrar {len(courses)}')
   
-  print('Geneerado horarios...')
   schedules = schedule_service.generate_schedules(
       courses=courses,
       n = request.length,
@@ -110,9 +107,7 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
       required_subjects=[required_subject[1] for required_subject in request.required_subjects]
     )
   
-  print('Ordenadno horarios...')
   schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
-  print(f'Número de horarios generados: {len(schedules)}')
   
   end = time.time()
   print("Time Taken: {:.6f}s".format(end-start))

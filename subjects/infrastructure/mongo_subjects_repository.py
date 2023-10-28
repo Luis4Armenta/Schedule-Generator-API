@@ -30,7 +30,6 @@ class MongoSubjectsRepository(SubjectRepository):
     self.subjects_collection = self.database['subjects1']
     
   def add_subject(self, subject: Subject) -> None:
-    print(subject)
     self.subjects_collection.insert_one(subject).inserted_id
   
   def get_subject(self, career: str, name: str) -> Optional[Subject]:
