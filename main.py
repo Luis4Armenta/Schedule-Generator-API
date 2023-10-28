@@ -55,6 +55,7 @@ def startup_db_clients():
   schedule_router.courses = app.courses  
   
   course_router.subjects = app.subjects
+  schedule_router.subjects = app.subjects
 
 origins = ["*"]
 

@@ -35,7 +35,8 @@ async def upload_schedules(
   ):
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
-  course_service = CourseService(router.courses, teacher_service)
+  subject_service = SubjectService(router.subjects)
+  course_service = CourseService(router.courses, teacher_service, subject_service)
   saes_service = SaesService(teacher_service)
   
   courses: List[Course] = saes_service.get_courses(await file.read())
@@ -59,7 +60,8 @@ async def upload_schedule_occupancy(
 ):
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
-  course_service = CourseService(router.courses, teacher_service)
+  subject_service = SubjectService(router.subjects)
+  course_service = CourseService(router.courses, teacher_service, subject_service)
   saes_service = SaesService(teacher_service)
   
   availabilities: List[CourseAvailability] = saes_service.get_course_availability(await file.read())
@@ -76,8 +78,8 @@ async def upload_schedule_occupancy(
 def get_courses(request: CoursesRequest) -> List[Course]:
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
-  course_service = CourseService(router.courses, teacher_service)
-  
+  subject_service = SubjectService(router.subjects)
+  course_service = CourseService(router.courses, teacher_service, subject_service)
   filtered_courses = course_service.get_courses(request.career, request.levels, request.semesters, request.shifts)
   
   return filtered_courses

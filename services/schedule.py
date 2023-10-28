@@ -15,6 +15,7 @@ class ScheduleService:
         self,
         courses: List[Course],
         n: int,
+        credits: float,
         required_subjects: List[str] = [],
     ) -> List[Schedule]:
         def backtrack(schedule: List[Course], start_index: int):
@@ -25,15 +26,20 @@ class ScheduleService:
                 if all(required_subject in schedule_subjects for required_subject in required_subjects):
                     # Calcular la polaridad promedio de los profesores en el horario
                     teachers_positive_score: List[float] = []
+                    credits_required: float = 0
                     for course in schedule:
                         teachers_positive_score.append(
                             course.teacher_popularity)
-
-                    schedule_result = Schedule(
-                        popularity=mean(teachers_positive_score),
-                        courses=schedule,
-                    )
-                    schedules.append(schedule_result)
+                        print(course)
+                        credits_required = credits_required + course.required_credits
+                    
+                    if credits_required <= credits:
+                      schedule_result = Schedule(
+                          popularity=mean(teachers_positive_score),
+                          courses=schedule,
+                          total_credits_required=credits_required
+                      )
+                      schedules.append(schedule_result)
                     return
                 else:
                     return

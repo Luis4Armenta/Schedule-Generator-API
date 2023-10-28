@@ -7,3 +7,4 @@ class Schedule(BaseModel):
   # start_time: str
   # end_time:str
   popularity: float = Field(title="Puntaje positivo", description="Promedio del puntaje positivo de todos los profesores que imparten las asignaturas que conforman el horario.")
+  total_credits_required: float = Field(title="Total de creditos requeridos", description="Creditones necesarios para meter el horario.")

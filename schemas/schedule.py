@@ -58,6 +58,11 @@ class ScheduleGeneratorRequest(BaseModel):
     description="Número de asignaturas que formaran parte de cada horario generado.",
     gt=2, lt=12
   )
+  credits: float = Field(
+    title="Creditos",
+    description="Cantidad de creditos con los que cuenta el alumno para canjear",
+    gt=0
+  )
   available_uses: int = Field(
     title="Usos disponibles",
     description="Número de lugares disponibles por curso.",

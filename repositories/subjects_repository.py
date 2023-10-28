@@ -9,7 +9,11 @@ class SubjectRepository(ABC):
     pass
 
   @abstractmethod
-  def add_subject(subject: Subject) -> None:
+  def add_subject(self, subject: Subject) -> None:
+    pass
+  
+  @abstractmethod
+  def get_subject(self, career: str, name: str) -> Subject:
     pass
   
   @abstractmethod

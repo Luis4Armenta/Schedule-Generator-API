@@ -34,6 +34,7 @@ class Course(BaseModel):
   course_availability: Optional[int] = Field(title="Disponibilidad", description="Número de lugares disponibles", default=40)
   teacher_popularity: Optional[float] = Field(title="Puntaje positivo del profesor", description="Puntaje positivo promedio del profesor calculado por el sistema.")
   
+  required_credits: Optional[float] = Field(title="Creditos requeridos")
   schedule: ScheduleCourse = Field(title="Horario")
   
 class Schedule(BaseModel):

@@ -12,6 +12,9 @@ from services.course import CourseService
 from services.teacher import TeacherService
 from services.schedule import ScheduleService
 from services.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+from services.subject import SubjectService
+from repositories.subjects_repository import SubjectRepository
+from repositories.mongo_subjects_repository import MongoSubjectsRepository
 
 router = APIRouter()
 
@@ -38,7 +41,8 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   '''
   start = time.time()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
-  course_service = CourseService(router.courses, teacher_service)
+  subject_service = SubjectService(router.subjects)
+  course_service = CourseService(router.courses, teacher_service, subject_service)
   schedule_service = ScheduleService(teacher_service)
 
   courses: List[Course] = course_service.get_courses(
@@ -104,6 +108,7 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   schedules = schedule_service.generate_schedules(
       courses=courses,
       n = request.length,
+      credits=request.credits,
       required_subjects=[required_subject[1] for required_subject in request.required_subjects]
     )
   

@@ -19,3 +19,6 @@ class SubjectService:
   def upload_subjects(self, subjects: List[Subject]) -> None:
     for subject in subjects:
       self.subject_repository.add_subject(subject.dict())
+      
+  def get_subject(self, career: str, name: str) -> Optional[Subject]:
+    return self.subject_repository.get_subject(career, name)

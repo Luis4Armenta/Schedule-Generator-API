@@ -7,12 +7,18 @@ from repositories.courses_repository import CourseRepository
 from services.teacher import TeacherService
 from services.course_filter.filter import CourseFilter, CourseChecker
 from services.course_filter.checkers import SubjectChecker, TeacherChecker, TimeChecker, AvailabilityChecker
-
+from services.subject import SubjectService
 
 class CourseService:
-  def __init__(self, course_repository: CourseRepository, teacher_service: TeacherService):
+  def __init__(
+      self,
+      course_repository: CourseRepository,
+      teacher_service: TeacherService,
+      subject_service: SubjectService
+    ):
     self.course_repository = course_repository
     self.teacher_service = teacher_service
+    self.subject_service = subject_service
   
   def filter_coruses(
     self,
@@ -46,7 +52,9 @@ class CourseService:
   def upload_courses(self, courses: List[Course]):
     for course in courses:
       teacher = self.teacher_service.get_teacher(course.teacher)
-      
+      sequence = course.sequence
+      print(sequence[1], course.subject)
+      subject = self.subject_service.get_subject(sequence[1], course.subject)
       popularity: float = 0.0
       if teacher:
         popularity = teacher.positive_score
@@ -54,6 +62,7 @@ class CourseService:
         popularity = 0.5
       
       course.teacher_popularity = popularity
+      course.required_credits = subject.credits_required
       self.course_repository.add_course_if_not_exist(course)
   
   def get_courses(

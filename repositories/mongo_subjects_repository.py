@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from typing import TypedDict
+from typing import TypedDict, Optional
 from models.course import Subject
 
 
@@ -34,6 +34,22 @@ class MongoSubjectsRepository(SubjectRepository):
   def add_subject(self, subject: Subject) -> None:
     print(subject)
     self.subjects_collection.insert_one(subject).inserted_id
+  
+  def get_subject(self, career: str, name: str) -> Optional[Subject]:
+    subject = self.subjects_collection.find_one({'career': career, 'name': name})
+
+    if subject:
+      return Subject(
+        career=subject['career'],
+        key=subject['key'],
+        level=subject['level'],
+        name=subject['name'],
+        plan=subject['plan'],
+        required=subject['required'],
+        credits_required=subject['credits_required']
+      )
+    else:
+      return None
 
   def disconnect(self) -> None:
     self.mongo_client.close()
