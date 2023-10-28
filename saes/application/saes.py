@@ -16,7 +16,6 @@ class SaesService(SAESService):
   def __init__(
       self,
       teacher_service: TeacherService,
-      # subject_repository: SubjectRepository
     ):
     self.teacher_service = teacher_service
     
@@ -25,11 +24,19 @@ class SaesService(SAESService):
 
     dom = etree.HTML(str(BeautifulSoup(document, 'html.parser', from_encoding='utf8')))
     raw_courses = dom.xpath('//table[@id="ctl00_mainCopy_dbgHorarios"]//tr')[1:]
+    props = dom.xpath('//select/option[@selected="selected"]/@value')
+    
+    career: str = props[0]
+    shift: str = props[1]
+    plan: str = props[2]
+    level: str = props[3]
 
 
     for idx, raw_course in enumerate(raw_courses):
       sequence = raw_course.xpath('./td/text()')[0].strip().upper()
       teacher_name = raw_course.xpath('./td/text()')[2]
+      if sequence[0] != level or sequence[3] != level:
+        continue
 
       sessions = get_sessions(raw_course)
       
