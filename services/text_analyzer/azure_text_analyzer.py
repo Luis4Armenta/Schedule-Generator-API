@@ -17,9 +17,9 @@ class AzureTextAnalyzer(TextAnalyzer):
     response = self.text_analytics_client.analyze_sentiment([text], language='es')
     docs: List[AnalyzeSentimentResult] = [doc for doc in response if not doc.is_error]
     
-    positive_score = docs[0].confidence_scores.positive
-    neutral_score = docs[0].confidence_scores.neutral
-    negative_score = docs[0].confidence_scores.negative
+    positive_score = docs[0].confidence_scores['positive']
+    neutral_score = docs[0].confidence_scores['neutral']
+    negative_score = docs[0].confidence_scores['negative']
     return (positive_score, neutral_score, negative_score)
   
   
@@ -33,9 +33,9 @@ class AzureTextAnalyzer(TextAnalyzer):
       for doc in res:
         if not doc.is_error:
           scores = (
-            doc.confidence_scores.positive,
-            doc.confidence_scores.neutral,
-            doc.confidence_scores.negative,
+            doc.confidence_scores['positive'],
+            doc.confidence_scores['neutral'],
+            doc.confidence_scores['negative'],
           )
         
           response.append(scores)
