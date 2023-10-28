@@ -84,11 +84,9 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
         not any(extra_subject_semester == semester for semester in request.semesters)
       ):
         courses = courses + course_service.get_courses_by_subject(
+          sequence=extra_subject_sequence,
           subject=extra_subject,
-          level=extra_subject_level,
-          career=extra_subject_career,
-          shifts=[extra_subject_shift],
-          semester=extra_subject_semester,
+          shifts=[required_subject_shift]
         )
   
   print(f'Número de cursos sin filtrar: {len(courses)}')
