@@ -8,6 +8,9 @@ def get_positive_score(positive_scores: List[float]) -> float:
   m = mean(positive_scores)
   std = stdev(positive_scores)
   
+  if std == 0:
+    return m
+  
   z_scores = [(x - m) / std for x in positive_scores]
   
   threshold = 3  
