@@ -41,75 +41,26 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
   subject_service = SubjectService(router.subjects)
   course_service = CourseService(router.courses, teacher_service, subject_service)
-  schedule_service = ScheduleService(teacher_service)
+  schedule_service = ScheduleService(teacher_service, course_service)
 
-  courses: List[Course] = course_service.get_courses(
-      request.career,
-      request.levels,
-      request.semesters,
-      request.shifts
-    )
-   
-  for required_subject in request.required_subjects:
-    required_subject_sequence = required_subject[0]
-    required_subject = required_subject[1]
-    
-    
-    required_subject_level = required_subject_sequence[0]
-    required_subject_shift = required_subject_sequence[2]
-    required_subject_semester = required_subject_sequence[3]
-    
-    if (
-        not any(required_subject_level == level for level in request.levels) or
-        not any(required_subject_shift == shift for shift in request.shifts) or
-        not any(required_subject_semester == semester for semester in request.semesters)
-      ):
-        courses = courses + course_service.get_courses_by_subject(
-          sequence=required_subject_sequence,
-          subject=required_subject,
-          shifts=[required_subject_shift]
-        )
-    
-  for extra_subject in request.extra_subjects:
-    extra_subject_sequence = extra_subject[0]
-    extra_subject = extra_subject[1]
-    
-    
-    extra_subject_level = extra_subject_sequence[0]
-    extra_subject_shift = extra_subject_sequence[2]
-    extra_subject_semester = extra_subject_sequence[3]
-    extra_subject_career = extra_subject_sequence[1]
-    
-    if (
-        not any(extra_subject_level == level for level in request.levels) or
-        not any(extra_subject_shift == shift for shift in request.shifts) or
-        not any(extra_subject_semester == semester for semester in request.semesters)
-      ):
-        courses = courses + course_service.get_courses_by_subject(
-          sequence=extra_subject_sequence,
-          subject=extra_subject,
-          shifts=[required_subject_shift]
-        )
-  
-  courses = course_service.filter_coruses(
-      courses=courses,
+  schedules = schedule_service.generate_schedules(
+      levels=request.levels,
+      career=request.career,
+      extra_subjects=request.extra_subjects,
+      required_subjects=request.required_subjects,
+      semesters=request.semesters,
+      shifts=request.shifts,
       start_time=request.start_time,
       end_time=request.end_time,
       excluded_teachers=request.excluded_teachers,
       excluded_subjects=request.excluded_subjects,
-      min_course_availability=request.available_uses
-    )
-  
-  schedules = schedule_service.generate_schedules(
-      courses=courses,
+      min_course_availability=request.available_uses,
       n = request.length,
       credits=request.credits,
-      required_subjects=[required_subject[1] for required_subject in request.required_subjects]
+      max_results = 20
     )
-  
-  schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
   
   end = time.time()
   print("Time Taken: {:.6f}s".format(end-start))
 
-  return schedules[:20]
+  return schedules 

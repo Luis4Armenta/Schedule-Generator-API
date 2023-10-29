@@ -1,29 +1,44 @@
 from statistics import mean
 
-from typing import List
+from typing import List, Tuple, Optional
 
 from courses.domain.model.course import Course
+from courses.application.course import CourseService
 from schedules.domain.model.schedule import Schedule
-
 from teachers.application.teacher import TeacherService
 
 class ScheduleService:
-    def __init__(self, teacher_service: TeacherService):
+    def __init__(
+        self,
+        teacher_service: TeacherService,
+        course_service: CourseService
+      ):
         self.teacher_service = teacher_service
+        self.course_service = course_service
 
     def generate_schedules(
         self,
-        courses: List[Course],
+        levels: List[str],
+        career: str,
+        extra_subjects: List[Tuple[str, str]],
+        required_subjects: List[Tuple[str, str]],
+        semesters: List[str],
+        shifts: List[str],
+        start_time: Optional[str],
+        end_time: Optional[str],
+        excluded_teachers: List[str],
+        excluded_subjects: List[str],
+        min_course_availability: int,
         n: int,
         credits: float,
-        required_subjects: List[str] = [],
+        max_results: int = 20
     ) -> List[Schedule]:
         def backtrack(schedule: List[Course], start_index: int):
             # Verificar si se ha alcanzado el tamaño objetivo del horario
             if len(schedule) == n:
                 schedule_subjects = [course.subject for course in schedule]
 
-                if all(required_subject in schedule_subjects for required_subject in required_subjects):
+                if all(required_subject in schedule_subjects for required_subject in required_name_subjects):
                     # Calcular la polaridad promedio de los profesores en el horario
                     teachers_positive_score: List[float] = []
                     credits_required: float = 0
@@ -69,7 +84,108 @@ class ScheduleService:
                         return True
             return False
 
+
+        courses = self._get_courses(
+          levels=levels,
+          career=career,
+          extra_subjects=extra_subjects,
+          required_subjects=required_subjects,
+          semesters=semesters,
+          shifts=shifts
+        )
+      
+        courses = self._filter_courses(
+          courses=courses,
+          start_time=start_time,
+          end_time=end_time,
+          excluded_teachers=excluded_teachers,
+          excluded_subjects=excluded_subjects,
+          min_course_availability=min_course_availability
+        )
+        
+        required_name_subjects = [required_subject[1] for required_subject in required_subjects]
+        
+
         schedules = []  # Lista para almacenar los horarios generados
         # Iniciar la generación de horarios desde un horario vacío y el índice de inicio 0
         backtrack([], 0)
-        return schedules
+        
+        schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
+        return schedules[:max_results]
+      
+    def _get_courses(
+      self,
+      career: str,
+      levels: List[str],
+      semesters: List[str],
+      shifts: List[str],
+      required_subjects: List[Tuple[str, str]],
+      extra_subjects: List[Tuple[str, str]]
+    ) -> List[Course]:
+      courses: List[Course] = self.course_service.get_courses(
+        career,
+        levels,
+        semesters,
+        shifts
+      )
+
+      for required_subject in required_subjects:
+        required_subject_sequence = required_subject[0]
+        required_subject = required_subject[1]
+        
+        
+        required_subject_level = required_subject_sequence[0]
+        required_subject_shift = required_subject_sequence[2]
+        required_subject_semester = required_subject_sequence[3]
+        
+        if (
+            not any(required_subject_level == level for level in levels) or
+            not any(required_subject_shift == shift for shift in shifts) or
+            not any(required_subject_semester == semester for semester in semesters)
+          ):
+            courses = courses + self.course_service.get_courses_by_subject(
+              sequence=required_subject_sequence,
+              subject=required_subject,
+              shifts=[required_subject_shift]
+            )
+            
+      
+      for extra_subject in extra_subjects:
+        extra_subject_sequence = extra_subject[0]
+        extra_subject = extra_subject[1]
+        
+        
+        extra_subject_level = extra_subject_sequence[0]
+        extra_subject_shift = extra_subject_sequence[2]
+        extra_subject_semester = extra_subject_sequence[3]
+        
+        if (
+            not any(extra_subject_level == level for level in levels) or
+            not any(extra_subject_shift == shift for shift in shifts) or
+            not any(extra_subject_semester == semester for semester in semesters)
+          ):
+            courses = courses + self.course_service.get_courses_by_subject(
+              sequence=extra_subject_sequence,
+              subject=extra_subject,
+              shifts=[required_subject_shift]
+            )
+            
+      return courses
+    
+    def _filter_courses(
+      self,
+      courses: List[Course],
+      start_time: Optional[str],
+      end_time: Optional[str],
+      min_course_availability: int = 1,
+      excluded_teachers: List[str] = [],
+      excluded_subjects: List[str] = [],
+    ):
+      return self.course_service.filter_coruses(
+        courses=courses,
+        start_time=start_time,
+        end_time=end_time,
+        excluded_teachers=excluded_teachers,
+        excluded_subjects=excluded_subjects,
+        min_course_availability=min_course_availability
+      )
