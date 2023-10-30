@@ -15,7 +15,10 @@ from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
 from teachers.application.teacher import TeacherService
 from teachers.infrastructure.text_analyzer.text_analyzer import TextAnalyzer
 from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
-
+from comments.application.comment import CommentService
+from comments.domain.comment import Comment, Teacher
+from comments.infrastructure.bs4_web_scraper import BS4WebScraper as Bs4
+from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer as AtextA
 router = APIRouter()
 
 @router.get(
@@ -39,6 +42,9 @@ def get_teacher_by_name(
   teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
   teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   teacher = teacher_service.get_teacher(teacher_name)
+
+  s = CommentService(Bs4(), AtextA())
+  s.find_comments(Teacher(name='CRUZ MARTINEZ RAMON'))
 
   if teacher:
     return JSONResponse(content=jsonable_encoder(teacher), status_code=202)
