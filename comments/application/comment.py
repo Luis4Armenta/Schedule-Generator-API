@@ -1,5 +1,5 @@
 from typing import List
-from comments.domain.web_scraper import WebScraper
+from comments.domain.comments_web_scraper import CommentsWebScraper
 from comments.domain.text_analyzer import TextAnalyzer
 
 from comments.domain.comment import Comment
@@ -7,7 +7,7 @@ from comments.domain.comment import Comment
 class CommentService:
   def __init__(
     self,
-    web_scraper: WebScraper,
+    web_scraper: CommentsWebScraper,
     text_analyzer: TextAnalyzer
   ):
     self.web_scraper = web_scraper

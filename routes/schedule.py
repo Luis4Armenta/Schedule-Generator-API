@@ -13,7 +13,7 @@ from schedules.application.schedule import ScheduleService
 from subjects.application.subject import SubjectService
 
 from comments.application.comment import CommentService
-from comments.infrastructure.bs4_web_scraper import BS4WebScraper
+from comments.infrastructure.bs4_comments_web_scraper import BS4CommentsWebScraper
 from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
@@ -40,7 +40,7 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   - **extra_subjects**: asignaturas opcionales que amplian el conjunto de asignaturas posibles en un horario.
   '''
   start = time.time()
-  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
   teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
   course_service = CourseService(router.courses, teacher_service, subject_service)

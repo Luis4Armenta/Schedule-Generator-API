@@ -9,10 +9,10 @@ from teachers.domain.model.teacher import Teacher
 from teachers.application.teacher import TeacherService
 
 from comments.application.comment import CommentService
-from comments.infrastructure.bs4_web_scraper import BS4WebScraper
+from comments.infrastructure.bs4_comments_web_scraper import BS4CommentsWebScraper
 from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
 from comments.domain.text_analyzer import TextAnalyzer
-from comments.domain.web_scraper import WebScraper
+from comments.domain.comments_web_scraper import CommentsWebScraper
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ def get_teacher_by_name(
           )
       ]
   ) -> Teacher:
-  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
   teacher_service = TeacherService(router.teachers, comment_service)
   
   teacher = teacher_service.get_teacher(teacher_name)

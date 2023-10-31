@@ -12,7 +12,7 @@ from teachers.application.teacher import TeacherService
 from saes.application.saes import SaesService
 
 from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
-from comments.infrastructure.bs4_web_scraper import BS4WebScraper
+from comments.infrastructure.bs4_comments_web_scraper import BS4CommentsWebScraper
 from comments.application.comment import CommentService
 
 from subjects.application.subject import SubjectService
@@ -34,7 +34,7 @@ async def upload_schedules(
       )
     ]
   ):
-  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
   teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
 
@@ -60,7 +60,7 @@ async def upload_schedule_availability(
     )
   ]
 ):
-  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
   teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
   
@@ -80,7 +80,7 @@ async def upload_schedule_availability(
   description='Obten una lista de cursos que cumplan con los parámetros dados.'
 )
 def get_courses(request: CoursesRequest) -> List[Course]:
-  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
   teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
 
