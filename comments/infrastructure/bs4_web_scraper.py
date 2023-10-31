@@ -5,7 +5,8 @@ import bs4
 import requests
 from lxml import etree
 
-from comments.domain.comment import Teacher, ScrapedComment
+from comments.domain.comment import Comment
+from teachers.domain.model.teacher import Teacher
 from comments.domain.web_scraper import WebScraper
 
 from utils.text import get_url_for_teacher
@@ -15,7 +16,7 @@ class BS4WebScraper(WebScraper):
     pass
   
   
-  def scrape_comments(self, teacher: Teacher) -> List[ScrapedComment]:
+  def scrape_comments(self, teacher: str) -> List[Comment]:
     if teacher == 'SIN ASIGNAR':
       return Teacher(
         id=None,
@@ -26,7 +27,7 @@ class BS4WebScraper(WebScraper):
         url='https://foroupiicsa.net/diccionario/'
       )
     
-    url = get_url_for_teacher(str(teacher).upper())
+    url = get_url_for_teacher(teacher.upper())
     response: Response = requests.get(url)
     response.raise_for_status()
 
@@ -35,7 +36,7 @@ class BS4WebScraper(WebScraper):
       dom = etree.HTML(str(soup))
       
       raw_comments = dom.xpath('//div[@class="p-4 box-profe bordeiz"]')
-      comments: List[ScrapedComment] = []
+      comments: List[Comment] = []
       
       for raw_comment in raw_comments:
         subject: str = raw_comment.xpath('.//span[@class="bluetx negritas"]/text()')[0]
@@ -44,7 +45,8 @@ class BS4WebScraper(WebScraper):
         dislikes: int = int(raw_comment.xpath('.//a[@rel="nolike"]//span/text()')[0])
         date: str = raw_comment.xpath('.//p[@class="fecha"]/text()')[0]
 
-        comment: ScrapedComment = ScrapedComment(
+        comment: Comment = Comment(
+          teacher=teacher,
           subject= subject,
           text= text,
           likes= likes,

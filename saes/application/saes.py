@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 
 from courses.domain.model.course import Course, session, ScheduleCourse, CourseAvailability
 from subjects.domain.model.subject import Subject
-from teachers.application.teacher import TeacherService
 
 class SAESService(ABC):
   def get_courses(self, document) -> List[Course]:
@@ -15,10 +14,9 @@ class SAESService(ABC):
 class SaesService(SAESService):
   def __init__(
       self,
-      teacher_service: TeacherService,
     ):
-    self.teacher_service = teacher_service
-    
+    pass
+  
   def get_courses(self, document) -> List[Course]:
     courses: List[Course] = []
 
@@ -34,7 +32,7 @@ class SaesService(SAESService):
 
     for idx, raw_course in enumerate(raw_courses):
       sequence = raw_course.xpath('./td/text()')[0].strip().upper()
-      teacher_name = raw_course.xpath('./td/text()')[2]
+      teacher_name = raw_course.xpath('./td/text()')[2].strip().upper()
       if sequence[0] != level or sequence[3] != level:
         continue
 
@@ -47,22 +45,13 @@ class SaesService(SAESService):
       schedule_course['thursday'] = sessions[3]
       schedule_course['friday'] = sessions[4]
       
-      teacher = self.teacher_service.get_teacher(teacher_name)
-      
-      popularity: float = 0.0
-      if teacher:
-        popularity = teacher.positive_score
-      else:
-        popularity = 0.5
-        
-
       course = Course(
         id=idx,
         sequence=sequence,
         subject=raw_course.xpath('./td/text()')[1],
         teacher=teacher_name,
         schedule=schedule_course,
-        teacher_popularity=popularity
+        course_availability=40,
       )
 
       courses.append(course)

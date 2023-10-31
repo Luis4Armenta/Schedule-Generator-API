@@ -5,15 +5,12 @@ from typing import List, Tuple, Optional
 from courses.domain.model.course import Course
 from courses.application.course import CourseService
 from schedules.domain.model.schedule import Schedule
-from teachers.application.teacher import TeacherService
 
 class ScheduleService:
     def __init__(
         self,
-        teacher_service: TeacherService,
         course_service: CourseService
       ):
-        self.teacher_service = teacher_service
         self.course_service = course_service
 
     def generate_schedules(

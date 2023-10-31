@@ -5,20 +5,18 @@ from fastapi import UploadFile, File
 from fastapi.responses import JSONResponse
 
 from courses.domain.model.course import Course, CourseAvailability
-from subjects.domain.model.subject import Subject
 from schemas.schedule import CoursesRequest
 
 from courses.application.course import CourseService
 from teachers.application.teacher import TeacherService
-from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
-from teachers.infrastructure.text_analyzer.text_analyzer import TextAnalyzer
-from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
+from saes.application.saes import SaesService
 
-from subjects.domain.ports.subjects_repository import SubjectRepository
-from subjects.infrastructure.mongo_subjects_repository import MongoSubjectsRepository
+from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
+from comments.infrastructure.bs4_web_scraper import BS4WebScraper
+from comments.application.comment import CommentService
 
 from subjects.application.subject import SubjectService
-from saes.application.saes import SaesService
+
 
 router = APIRouter()
 
@@ -36,11 +34,12 @@ async def upload_schedules(
       )
     ]
   ):
-  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
+  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
+
   course_service = CourseService(router.courses, teacher_service, subject_service)
-  saes_service = SaesService(teacher_service)
+  saes_service = SaesService()
   
   courses: List[Course] = saes_service.get_courses(await file.read())
   course_service.upload_courses(courses)
@@ -52,7 +51,7 @@ async def upload_schedules(
   summary='Actualiza la disponibilidad de los cursos',
   description='Actualiza la disponibilidad de los cursos mediante un archivo html del SAES.'
 )
-async def upload_schedule_occupancy(
+async def upload_schedule_availability(
   file: Annotated[
     UploadFile,
     File(
@@ -61,11 +60,13 @@ async def upload_schedule_occupancy(
     )
   ]
 ):
-  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
+  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
+  
+  
   course_service = CourseService(router.courses, teacher_service, subject_service)
-  saes_service = SaesService(teacher_service)
+  saes_service = SaesService()
   
   availabilities: List[CourseAvailability] = saes_service.get_course_availability(await file.read())
   course_service.update_course_availability(availabilities=availabilities)
@@ -79,10 +80,12 @@ async def upload_schedule_occupancy(
   description='Obten una lista de cursos que cumplan con los parámetros dados.'
 )
 def get_courses(request: CoursesRequest) -> List[Course]:
-  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
+  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
+
   course_service = CourseService(router.courses, teacher_service, subject_service)
+  
   filtered_courses = course_service.get_courses(request.career, request.levels, request.semesters, request.shifts)
   
   return filtered_courses
@@ -97,13 +100,11 @@ async def upload_subjects(
       )
     ]
   ):
-  teacher_evaluator: TextAnalyzer = AzureTextAnalyzer()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(teacher_evaluator))
   subject_service = SubjectService(router.subjects)
-  saes_service = SaesService(teacher_service)
+  saes_service = SaesService()
   
   
-  subjects: List[Subject] = saes_service.get_subjects(await file.read())
+  subjects = saes_service.get_subjects(await file.read())
   subject_service.upload_subjects(subjects)
   
   return JSONResponse(content={"message": "subjects uploaded!"}, status_code=202)

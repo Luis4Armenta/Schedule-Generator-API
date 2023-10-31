@@ -7,12 +7,14 @@ from courses.domain.model.course import Course
 from schedules.domain.model.schedule import Schedule
 from schemas.schedule import ScheduleGeneratorRequest
 
-from teachers.infrastructure.bs4_web_scraper import BS4WebScraper
 from courses.application.course import CourseService
 from teachers.application.teacher import TeacherService
 from schedules.application.schedule import ScheduleService
-from teachers.infrastructure.text_analyzer.azure_text_analyzer import AzureTextAnalyzer
 from subjects.application.subject import SubjectService
+
+from comments.application.comment import CommentService
+from comments.infrastructure.bs4_web_scraper import BS4WebScraper
+from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
@@ -38,10 +40,12 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   - **extra_subjects**: asignaturas opcionales que amplian el conjunto de asignaturas posibles en un horario.
   '''
   start = time.time()
-  teacher_service = TeacherService(router.teachers, BS4WebScraper(AzureTextAnalyzer()))
+  comment_service = CommentService(BS4WebScraper(), AzureTextAnalyzer())
+  teacher_service = TeacherService(router.teachers, comment_service)
   subject_service = SubjectService(router.subjects)
   course_service = CourseService(router.courses, teacher_service, subject_service)
-  schedule_service = ScheduleService(teacher_service, course_service)
+
+  schedule_service = ScheduleService(course_service)
 
   schedules = schedule_service.generate_schedules(
       levels=request.levels,
