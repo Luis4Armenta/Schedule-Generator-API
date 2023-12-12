@@ -1,5 +1,6 @@
+import os
+
 from typing import List, Tuple
-from dotenv import dotenv_values
 
 from comments.domain.comment import SentimentAnalysis
 from comments.domain.text_analyzer import TextAnalyzer
@@ -9,11 +10,9 @@ from azure.ai.textanalytics import TextAnalyticsClient, AnalyzeSentimentResult
 
 
 class AzureTextAnalyzer(TextAnalyzer):
-  def __init__(self):
-    config = dotenv_values('.env')
-    
-    self.endpoint = config['AZURE_LANGUAGE_ENDPOINT']
-    self.key = config["AZURE_LANGUAGE_KEY"]
+  def __init__(self):    
+    self.endpoint = os.environ['AZURE_LANGUAGE_ENDPOINT']
+    self.key = os.environ["AZURE_LANGUAGE_KEY"]
 
     self.text_analytics_client = TextAnalyticsClient(self.endpoint, AzureKeyCredential(self.key))
 

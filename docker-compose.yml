@@ -11,6 +11,15 @@ services:
       - db
     networks:
       - my-network
+    env_file:
+      - .env
+    environment:
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - AZURE_LANGUAGE_ENDPOINT=${AZURE_LANGUAGE_ENDPOINT}
+      - AZURE_LANGUAGE_KEY=${AZURE_LANGUAGE_KEY}
+
   db:
     container_name: mongodb
     image: mongo:latest

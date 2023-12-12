@@ -1,5 +1,6 @@
+import os
+
 from fastapi import FastAPI
-from dotenv import dotenv_values
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,8 +16,6 @@ from subjects.infrastructure.mongo_subjects_repository import MongoSubjectsRepos
 
 from utils.enums import Tags
 
-config = dotenv_values('.env')
-
 app = FastAPI()
 app.title = 'Profesores-API'
 app.version = '0.0.1'
@@ -24,25 +23,25 @@ app.version = '0.0.1'
 @app.on_event('startup')
 def startup_db_clients():
   app.teachers: TeacherRepository = MongoTeachersRepository({
-    'host': config['MONGODB_HOST'],
-    'port': int(config['MONGODB_PORT']),
-    'database': config['MONGODB_DATABASE']
+    'host': os.environ['MONGODB_HOST'],
+    'port': int(os.environ['MONGODB_PORT']),
+    'database': os.environ['MONGODB_DATABASE']
   })
   
   app.teachers.connect()
   
   app.courses: CourseRepository = MongoCourseRepository({
-    'host': config['MONGODB_HOST'],
-    'port': int(config['MONGODB_PORT']),
-    'database': config['MONGODB_DATABASE']
+    'host': os.environ['MONGODB_HOST'],
+    'port': int(os.environ['MONGODB_PORT']),
+    'database': os.environ['MONGODB_DATABASE']
   })
   
   app.courses.connect()
   
   app.subjects: SubjectRepository = MongoSubjectsRepository({
-    'host': config['MONGODB_HOST'],
-    'port': int(config['MONGODB_PORT']),
-    'database': config['MONGODB_DATABASE']
+    'host': os.environ['MONGODB_HOST'],
+    'port': int(os.environ['MONGODB_PORT']),
+    'database': os.environ['MONGODB_DATABASE']
   })
   
   app.subjects.connect()
