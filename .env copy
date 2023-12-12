@@ -1,0 +1,7 @@
+# MONGODB_HOST=localhost
+MONGODB_HOST=mongodb://dev:password@mongodb:27017/
+MONGODB_PORT=27017
+MONGODB_DATABASE=schedules_database
+
+AZURE_LANGUAGE_ENDPOINT=<azure cognitive services language endpoint>
+AZURE_LANGUAGE_KEY=<azure cognitive services language key>
