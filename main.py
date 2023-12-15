@@ -22,8 +22,10 @@ app.version = '0.0.1'
 
 @app.on_event('startup')
 def startup_db_clients():
+  str_connection = f'mongodb://{os.environ["MONGODB_USER"]}:{os.environ["MONGODB_PASSWORD"]}@{os.environ["MONGODB_HOST"]}/'
+  
   app.teachers: TeacherRepository = MongoTeachersRepository({
-    'host': os.environ['MONGODB_HOST'],
+    'host': str_connection,
     'port': int(os.environ['MONGODB_PORT']),
     'database': os.environ['MONGODB_DATABASE']
   })
@@ -31,7 +33,7 @@ def startup_db_clients():
   app.teachers.connect()
   
   app.courses: CourseRepository = MongoCourseRepository({
-    'host': os.environ['MONGODB_HOST'],
+    'host': str_connection,
     'port': int(os.environ['MONGODB_PORT']),
     'database': os.environ['MONGODB_DATABASE']
   })
@@ -39,7 +41,7 @@ def startup_db_clients():
   app.courses.connect()
   
   app.subjects: SubjectRepository = MongoSubjectsRepository({
-    'host': os.environ['MONGODB_HOST'],
+    'host': str_connection,
     'port': int(os.environ['MONGODB_PORT']),
     'database': os.environ['MONGODB_DATABASE']
   })
