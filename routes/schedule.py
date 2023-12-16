@@ -18,7 +18,7 @@ from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
-@router.get(
+@router.post(
   '/schedules/',
   summary='Generar horarios',
   response_description="Una lista ordenada de 20 horarios generados de mejor puntuados a peor puntuados."
