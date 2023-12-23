@@ -13,7 +13,6 @@ class CourseRepository(ABC):
       self,
       levels: List[str],
       career: str,
-      shifts: List[str],
       semesters: List[str],
       subjects: List[str] = []
     ) -> List[Course]:

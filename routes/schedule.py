@@ -53,7 +53,6 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
       extra_subjects=request.extra_subjects,
       required_subjects=request.required_subjects,
       semesters=request.semesters,
-      shifts=request.shifts,
       start_time=request.start_time,
       end_time=request.end_time,
       excluded_teachers=request.excluded_teachers,

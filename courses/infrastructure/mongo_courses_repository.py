@@ -36,10 +36,9 @@ class MongoCourseRepository(CourseRepository):
       levels: List[str],
       career: str,
       semesters: List[str],
-      shifts: List[str] = ['M', 'V'],
       subjects: List[str] = []
     ) -> List[Course]:
-    expression = generate_regex(levels, career, shifts, semesters)
+    expression = generate_regex(levels, career, ['M', 'V'], semesters)
     query = {
       "sequence": {
         "$regex": expression,

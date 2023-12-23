@@ -69,14 +69,12 @@ class CourseService:
       career: str,
       levels: List[str],
       semesters: List[str],
-      shifts: List[str]
     ) -> List[Course]:
     
     return self.course_repository.get_courses(
       levels=levels,
       career=career,
       semesters=semesters,
-      shifts=shifts
     )
   
   def get_courses_by_subject(

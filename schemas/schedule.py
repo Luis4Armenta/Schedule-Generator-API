@@ -46,13 +46,6 @@ class ScheduleGeneratorRequest(BaseModel):
     description="Qué es lo más tarde a lo que finalizaran los horarios.",
     default='07:00'
   )
-  shifts: List[Shift] = Field(
-    title="Turnos",
-    description="Arreglo de turnos a los que pertencen los cursos que se tomaran en cuenta para conformar el horario.",
-    default=[Shift.morning, Shift.afternoon],
-    min_items=1,
-    max_items=2
-  )
   length: int = Field(
     title="Número de asignaturas",
     description="Número de asignaturas que formaran parte de cada horario generado.",

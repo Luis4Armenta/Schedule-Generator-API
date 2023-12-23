@@ -20,7 +20,6 @@ class ScheduleService:
         extra_subjects: List[Tuple[str, str]],
         required_subjects: List[Tuple[str, str]],
         semesters: List[str],
-        shifts: List[str],
         start_time: Optional[str],
         end_time: Optional[str],
         excluded_teachers: List[str],
@@ -88,7 +87,6 @@ class ScheduleService:
           extra_subjects=extra_subjects,
           required_subjects=required_subjects,
           semesters=semesters,
-          shifts=shifts
         )
       
         courses = self._filter_courses(
@@ -115,15 +113,13 @@ class ScheduleService:
       career: str,
       levels: List[str],
       semesters: List[str],
-      shifts: List[str],
       required_subjects: List[Tuple[str, str]],
       extra_subjects: List[Tuple[str, str]]
     ) -> List[Course]:
       courses: List[Course] = self.course_service.get_courses(
         career,
         levels,
-        semesters,
-        shifts
+        semesters
       )
 
       for required_subject in required_subjects:
@@ -137,7 +133,6 @@ class ScheduleService:
         
         if (
             not any(required_subject_level == level for level in levels) or
-            not any(required_subject_shift == shift for shift in shifts) or
             not any(required_subject_semester == semester for semester in semesters)
           ):
             courses = courses + self.course_service.get_courses_by_subject(
@@ -153,12 +148,10 @@ class ScheduleService:
         
         
         extra_subject_level = extra_subject_sequence[0]
-        extra_subject_shift = extra_subject_sequence[2]
         extra_subject_semester = extra_subject_sequence[3]
         
         if (
             not any(extra_subject_level == level for level in levels) or
-            not any(extra_subject_shift == shift for shift in shifts) or
             not any(extra_subject_semester == semester for semester in semesters)
           ):
             courses = courses + self.course_service.get_courses_by_subject(
