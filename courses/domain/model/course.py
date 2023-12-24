@@ -1,14 +1,13 @@
 from typing import Optional, TypedDict, Tuple, List
 from pydantic import BaseModel, Field
+from bson import ObjectId
 
-session = Optional[Tuple[str, str]]
+class Session(TypedDict):
+  day: str
+  start_time: str
+  end_time: str
 
-class ScheduleCourse(TypedDict):
-  monday: session
-  tuesday: session
-  wednesday: session
-  thursday: session
-  friday: session
+ScheduleCourse = List[Session]
 
 class CourseAvailability(BaseModel):
   sequence: str
@@ -16,8 +15,13 @@ class CourseAvailability(BaseModel):
   course_availability: int
 
 class Course(BaseModel):
-  id: Optional[str]
-  
+  _id: Optional[ObjectId] = Field(default_factory=ObjectId, alias='_id')
+
+  plan: str = Field(title="Plan", description="Plan al que pertence el curso")
+  level: str = Field(title="Nivel", description="Nivel del curso")
+  career: str = Field(title="Carrera", description="Carrera a la que pertenece el curso")
+  shift: str = Field(title="Turno", description="Turno en el que se imparte el curso")
+  semester: str = Field(title="Semestre", description="Semestre del curso")
   sequence: str = Field(title="Secuencia", description="Grupo al que pertenece el curso")
   teacher: str = Field(title="Instrictor", description="Nombre del instructor que imparte el curso")
   subject: str = Field(title="Asignatura", description="Nombre de la asignatura")

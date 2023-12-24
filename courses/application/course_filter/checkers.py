@@ -29,12 +29,9 @@ class TimeChecker(CourseChecker):
     self.end_time = end_time
     
   def check(self, course: Course) -> bool:    
-    for _, session in course.schedule.items():
-      if session is not None:
-        session_start, session_end = session
-        
-        if session_start < self.start_time or session_end > self.end_time:
-          return False
+    for session in course.schedule:
+      if session['start_time'] < self.start_time or session['end_time'] > self.end_time:
+        return False
     
     return True
   

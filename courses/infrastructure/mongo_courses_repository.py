@@ -29,7 +29,7 @@ class MongoCourseRepository(CourseRepository):
   def connect(self) -> None:
     self.mongo_client = MongoClient(host=self.config['host'], port=self.config['port'])
     self.database = self.mongo_client[self.config['database']]
-    self.course_collection = self.database['courses']
+    self.course_collection = self.database['courses1']
 
   def get_courses(
       self,

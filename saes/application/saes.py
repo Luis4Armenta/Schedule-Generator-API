@@ -4,7 +4,7 @@ from typing import List
 from lxml import etree
 from bs4 import BeautifulSoup
 
-from courses.domain.model.course import Course, session, ScheduleCourse, CourseAvailability
+from courses.domain.model.course import Course, ScheduleCourse, CourseAvailability
 from subjects.domain.model.subject import Subject
 
 class SAESService(ABC):
@@ -25,28 +25,28 @@ class SaesService(SAESService):
     props = dom.xpath('//select/option[@selected="selected"]/@value')
     
     career: str = props[0]
-    shift: str = props[1]
     plan: str = props[2]
     level: str = props[3]
 
 
-    for idx, raw_course in enumerate(raw_courses):
+    for raw_course in raw_courses:
       sequence = raw_course.xpath('./td/text()')[0].strip().upper()
+      level = sequence[0]
+      shift = sequence[2]
+      semester = sequence[3]
       teacher_name = raw_course.xpath('./td/text()')[2].strip().upper()
+
       if sequence[0] != level or sequence[3] != level:
         continue
 
-      sessions = get_sessions(raw_course)
-      
-      schedule_course: ScheduleCourse = ScheduleCourse()
-      schedule_course['monday'] = sessions[0]
-      schedule_course['tuesday'] = sessions[1]
-      schedule_course['wednesday'] = sessions[2]
-      schedule_course['thursday'] = sessions[3]
-      schedule_course['friday'] = sessions[4]
+      schedule_course: ScheduleCourse = get_sessions(raw_course)
       
       course = Course(
-        id=idx,
+        semester=semester,
+        career=career,
+        level=level,
+        plan=plan,
+        shift=shift,
         sequence=sequence,
         subject=raw_course.xpath('./td/text()')[1],
         teacher=teacher_name,
@@ -112,15 +112,18 @@ class SaesService(SAESService):
       
     return subjects 
     
-def get_sessions(raw_course) -> session:
-  sessions: List[session] = []
+def get_sessions(raw_course) -> ScheduleCourse:
+  sessions: ScheduleCourse = []
   
   days = raw_course.xpath('./td/text()')[5:-1]
-  for day in days:
-    day: str = day.strip()
-    if day:
-      sessions.append(tuple(day.split('-')))
-    else:
-      sessions.append(None)
+  for session, day in zip(days, ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']):
+    session: str = session.strip()
+    if session:
+      start_time, end_time = session.split('-')
+      sessions.append({
+        'day': day,
+        'start_time': start_time,
+        'end_time': end_time,
+      })
       
   return sessions

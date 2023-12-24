@@ -70,14 +70,14 @@ class ScheduleService:
 
         # Verificar si dos cursos tienen superposición en su horario
         def has_overlap(course1: Course, course2: Course) -> bool:
-            for day, session1 in course1.schedule.items():
-                session2 = course2.schedule.get(day)
-                if session1 and session2:
-                    session1_start, session1_end = session1
-                    session2_start, session2_end = session2
+            for session1 in course1.schedule:
+                for session2 in course2.schedule:
+                    if session1['day'] == session2['day']:
+                        session1_start, session1_end = session1['start_time'], session1['end_time']
+                        session2_start, session2_end = session2['start_time'], session2['end_time']
 
-                    if not (session1_end <= session2_start or session1_start >= session2_end):
-                        return True
+                        if not (session1_end <= session2_start or session1_start >= session2_end):
+                            return True
             return False
 
 
