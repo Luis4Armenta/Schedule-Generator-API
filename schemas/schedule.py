@@ -86,7 +86,7 @@ class CoursesRequest(BaseModel):
   career: Career = Field(title="Carrera", description="Letra que identifica la carrera")
   levels: List[Level] = Field(title="Niveles", description="Arreglo de los niveles al que pertenecen los cursos que se desean consultar.", min_items=1)
   semesters: List[Semester] = Field(title="Semestres", description="Arreglo de los semestre al que pertenecen los cursos que se desean consultar.", min_items=1)
-  # shifts: List[Shift] = Field(title="Turnos", description="Arreglo que turnos al que pertenecen los cursos que se desean consultar.", min_items=1, max_items=2)
+  shifts: List[Shift] = Field(title="Turnos", description="Arreglo que turnos al que pertenecen los cursos que se desean consultar.", min_items=1, max_items=2, default=['M', 'V'])
   
   class Config:
     

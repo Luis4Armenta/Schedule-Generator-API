@@ -86,7 +86,7 @@ def get_courses(request: CoursesRequest) -> List[Course]:
 
   course_service = CourseService(router.courses, teacher_service, subject_service)
   
-  filtered_courses = course_service.get_courses(request.career, request.levels, request.semesters)
+  filtered_courses = course_service.get_courses(request.career, request.levels, request.semesters, request.shifts)
   
   return filtered_courses
 

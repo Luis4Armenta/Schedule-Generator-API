@@ -26,7 +26,7 @@ class Course(BaseModel):
   teacher: str = Field(title="Instrictor", description="Nombre del instructor que imparte el curso")
   subject: str = Field(title="Asignatura", description="Nombre de la asignatura")
   course_availability: Optional[int] = Field(title="Disponibilidad", description="Número de lugares disponibles", default=40)
-  teacher_popularity: Optional[float] = Field(title="Puntaje positivo del profesor", description="Puntaje positivo promedio del profesor calculado por el sistema.")
+  teacher_positive_score: Optional[float] = Field(title="Puntaje positivo del profesor", description="Puntaje positivo promedio del profesor calculado por el sistema.")
   
   required_credits: Optional[float] = Field(title="Creditos requeridos")
   schedule: ScheduleCourse = Field(title="Horario")

@@ -13,7 +13,7 @@ class CommentService:
     self.web_scraper = web_scraper
     self.text_analyzer = text_analyzer
   
-  def seach_comments(self, teacher_name: str):
+  def seach_comments(self, teacher_name: str) -> List[Comment]:
     scraped_comments: List[Comment] = self.web_scraper.scrape_comments(teacher_name)
     
     if len(scraped_comments) == 0:

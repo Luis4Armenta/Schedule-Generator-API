@@ -56,9 +56,8 @@ class TeacherService:
     comments: List[Comment] = self.comment_service.seach_comments(teacher_name)
     
     # if there are comments
-    if len(comments) != 0:
+    if len(comments) > 0:
       # build teacher entity
-      subjects: List[str] = [c.subject for c in comments]
       positive_scores: List[float] = [c.positive_score for c in comments]
       positive_score = get_positive_score(positive_scores)
       teacher_url = get_url_for_teacher(teacher_name)
@@ -66,7 +65,6 @@ class TeacherService:
       teacher: Teacher = Teacher(
         name=teacher_name,
         comments=comments,
-        subjects=subjects,
         url=teacher_url,
         positive_score=positive_score
       )
@@ -78,11 +76,13 @@ class TeacherService:
       teacher_url = get_url_for_teacher(teacher_name)
       return Teacher(
         name=teacher_name,
-        subjects=[],
         comments=[],
         positive_score=0.5,
         url=teacher_url
       )
       
   def add_teacher(self, new_teacher: Teacher) -> None:
-    self.teacher_repository.add_teacher(new_teacher)
+    teacher = self.teacher_repository.get_teacher(new_teacher.name)
+    if teacher is None:
+      self.teacher_repository.add_teacher(new_teacher)
+    

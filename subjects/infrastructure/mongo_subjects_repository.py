@@ -27,7 +27,7 @@ class MongoSubjectsRepository(SubjectRepository):
   def connect(self) -> None:
     self.mongo_client = MongoClient(host=self.config['host'], port=self.config['port'])
     self.database = self.mongo_client[self.config['database']]
-    self.subjects_collection = self.database['subjects1']
+    self.subjects_collection = self.database['subjects']
     
   def add_subject(self, subject: Subject) -> None:
     self.subjects_collection.insert_one(subject).inserted_id

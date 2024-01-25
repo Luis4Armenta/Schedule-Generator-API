@@ -14,7 +14,8 @@ class CourseRepository(ABC):
       levels: List[str],
       career: str,
       semesters: List[str],
-      subjects: List[str] = []
+      subjects: List[str] = [],
+      shifts: List[str] = ['M', 'V']
     ) -> List[Course]:
     pass
   

@@ -60,7 +60,7 @@ class CourseService:
       else:
         popularity = 0.5
       
-      course.teacher_popularity = popularity
+      course.teacher_positive_score = popularity
       course.required_credits = subject.credits_required
       self.course_repository.add_course_if_not_exist(course)
   
@@ -69,19 +69,21 @@ class CourseService:
       career: str,
       levels: List[str],
       semesters: List[str],
+      shifts: List[str] = ['M', 'V']
     ) -> List[Course]:
     
     return self.course_repository.get_courses(
       levels=levels,
       career=career,
       semesters=semesters,
+      shifts=shifts,
     )
   
   def get_courses_by_subject(
       self,
       sequence: str,
       subject: str,
-      shifts: List[str] = ['M', 'V']
+      shifts: List[str] = ['M', 'V'],
     ) -> List[Course]:
     level = sequence[0]
     career = sequence[1]

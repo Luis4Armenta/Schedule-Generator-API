@@ -1,5 +1,4 @@
 from statistics import mean
-
 from typing import List, Tuple, Optional
 
 from courses.domain.model.course import Course
@@ -40,12 +39,12 @@ class ScheduleService:
                     credits_required: float = 0
                     for course in schedule:
                         teachers_positive_score.append(
-                            course.teacher_popularity)
+                            course.teacher_positive_score)
                         credits_required = credits_required + course.required_credits
                     
                     if credits_required <= credits:
                       schedule_result = Schedule(
-                          popularity=mean(teachers_positive_score),
+                          avg_positive_score=mean(teachers_positive_score),
                           courses=schedule,
                           total_credits_required=credits_required
                       )
@@ -101,12 +100,17 @@ class ScheduleService:
         required_name_subjects = [required_subject[1] for required_subject in required_subjects]
         
 
-        schedules = []  # Lista para almacenar los horarios generados
+        schedules: List[Schedule] = []  # Lista para almacenar los horarios generados
         # Iniciar la generación de horarios desde un horario vacío y el índice de inicio 0
         backtrack([], 0)
         
-        schedules = sorted(schedules, key=lambda x: x.popularity, reverse=True)
-        return schedules[:max_results]
+        schedules = sorted(schedules, key=lambda x: x.avg_positive_score, reverse=True)
+        
+        r = [] 
+        for value, schedule in enumerate(schedules[:max_results]):
+          schedule.option = value
+          r.append(schedule)
+        return r
       
     def _get_courses(
       self,

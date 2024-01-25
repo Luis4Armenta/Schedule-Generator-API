@@ -30,10 +30,9 @@ class Comment(BaseModel):
   
 
 class Teacher(BaseModel):
-  id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias='_id')
+  _id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias='_id')
   name: str = Field(title="Nombre del profesor")
   url: HttpUrl = Field(title="Perfil del profesor", description="Url a (diccionario de maestros) de donde se extrajeron los datos")
-  subjects: List[str] = Field(title="Asignaturas", description="Asignaturas que imparte el profesor")
   positive_score: float = Field(title="Puntuación positiva", description="Opinion promedio a 3 desviaciones estándar en el diccionario de profesores")
   comments: List[Comment] = Field(title="Comentarios", description="Comentarios extraídos del diccionario de maestros.")
   
@@ -45,7 +44,6 @@ class Teacher(BaseModel):
       "example": {
           "_id": "066de609-b04a-4b30-b46c-32537c7f1f6e",
           "name": "José Pérez",
-          "subjects": ["Probabilidad"],
           "comments": [{
             "text": "Este es un buen profesor.",
             "date": "21-11-2019",

@@ -29,16 +29,17 @@ class MongoCourseRepository(CourseRepository):
   def connect(self) -> None:
     self.mongo_client = MongoClient(host=self.config['host'], port=self.config['port'])
     self.database = self.mongo_client[self.config['database']]
-    self.course_collection = self.database['courses1']
+    self.course_collection = self.database['courses']
 
   def get_courses(
       self,
       levels: List[str],
       career: str,
       semesters: List[str],
-      subjects: List[str] = []
+      subjects: List[str] = [],
+      shifts: List[str] = ['M', 'V']
     ) -> List[Course]:
-    expression = generate_regex(levels, career, ['M', 'V'], semesters)
+    expression = generate_regex(levels, career, shifts, semesters)
     query = {
       "sequence": {
         "$regex": expression,
