@@ -3,6 +3,3 @@ MONGODB_PORT=27017
 MONGODB_DATABASE=schedule-generator
 MONGODB_USER=dev
 MONGODB_PASSWORD=password
-
-AZURE_LANGUAGE_ENDPOINT=<azure cognitive services language endpoint>
-AZURE_LANGUAGE_KEY=<azure cognitive services language key>
