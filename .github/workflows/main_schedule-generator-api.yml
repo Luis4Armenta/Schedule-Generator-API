@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: schedulegenerator.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_36166b14a51f426bb3989daa962577e5 }}/schedule-generator-api:${{ github.sha }}
+        tags: schedulegenerator.azurecr.io/schedule-generator-api:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
