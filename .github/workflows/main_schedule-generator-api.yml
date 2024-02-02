@@ -48,4 +48,4 @@ jobs:
         app-name: 'schedule-generator-api'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_6dd16991c343413b92aa09b5781cee86 }}
-        images: 'schedulegenerator.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_36166b14a51f426bb3989daa962577e5 }}/schedule-generator-api:${{ github.sha }}'
+        images: 'schedulegenerator.azurecr.io/schedule-generator-api:${{ github.sha }}'
