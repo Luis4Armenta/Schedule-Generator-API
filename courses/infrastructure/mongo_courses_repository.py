@@ -1,3 +1,5 @@
+import os
+
 from pymongo import MongoClient
 from typing import TypedDict, List
 
@@ -16,19 +18,12 @@ def singleton(cls):
 
     return wrapper
 
-class MongoConfig(TypedDict):
-  host: str
-  port: int
-  database: str
 
 @singleton
 class MongoCourseRepository(CourseRepository):
-  def __init__(self, config: MongoConfig):
-    self.config = config
-    
   def connect(self) -> None:
-    self.mongo_client = MongoClient(host=self.config['host'], port=self.config['port'])
-    self.database = self.mongo_client[self.config['database']]
+    self.mongo_client = MongoClient(os.environ['MONGODB_CONNECTION_STRING'])
+    self.database = self.mongo_client[os.environ['MONGODB_DATABASE']]
     self.course_collection = self.database['courses']
 
   def get_courses(
