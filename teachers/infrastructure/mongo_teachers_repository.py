@@ -43,9 +43,6 @@ class MongoTeachersRepository(TeacherRepository):
     else:
       return None
   
-  def add_teacher(self, teacher: Teacher) -> None:
-    self.teachers_collection.insert_one(teacher.dict())
-
   def disconnect(self) -> None:
     self.mongo_client.close()
     

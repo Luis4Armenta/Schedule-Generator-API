@@ -13,10 +13,6 @@ class TeacherRepository(ABC):
     pass
   
   @abstractmethod
-  def add_teacher(self, teacher: Teacher) -> None:
-    pass
-  
-  @abstractmethod
   def disconnect(self) -> None:
     pass
 

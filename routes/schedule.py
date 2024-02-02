@@ -3,18 +3,11 @@ from typing import List
 
 from fastapi import APIRouter
 
-from courses.domain.model.course import Course
 from schedules.domain.model.schedule import Schedule
 from schemas.schedule import ScheduleGeneratorRequest
 
 from courses.application.course import CourseService
-from teachers.application.teacher import TeacherService
 from schedules.application.schedule import ScheduleService
-from subjects.application.subject import SubjectService
-
-from comments.application.comment import CommentService
-from comments.infrastructure.bs4_comments_web_scraper import BS4CommentsWebScraper
-from comments.infrastructure.azure_text_analyzer import AzureTextAnalyzer
 
 router = APIRouter()
 
@@ -40,10 +33,7 @@ async def generate_schedules(request: ScheduleGeneratorRequest) -> List[Schedule
   - **extra_subjects**: asignaturas opcionales que amplian el conjunto de asignaturas posibles en un horario.
   '''
   start = time.time()
-  comment_service = CommentService(BS4CommentsWebScraper(), AzureTextAnalyzer())
-  teacher_service = TeacherService(router.teachers, comment_service)
-  subject_service = SubjectService(router.subjects)
-  course_service = CourseService(router.courses, teacher_service, subject_service)
+  course_service = CourseService(router.courses)
 
   schedule_service = ScheduleService(course_service)
 

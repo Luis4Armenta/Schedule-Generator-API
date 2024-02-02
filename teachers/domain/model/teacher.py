@@ -2,7 +2,6 @@ from bson import ObjectId
 from pydantic import BaseModel, Field, HttpUrl
 from typing import List, Optional
 
-
 class PyObjectId(ObjectId):
   @classmethod
   def __get_validators__(cls):

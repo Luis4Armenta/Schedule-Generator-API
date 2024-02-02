@@ -9,10 +9,8 @@ from routes.teacher import router as teacher_router
 from routes.schedule import router as schedule_router
 from courses.domain.ports.courses_repository import CourseRepository
 from teachers.domain.ports.teachers_repository import TeacherRepository
-from subjects.domain.ports.subjects_repository import SubjectRepository
 from teachers.infrastructure.mongo_teachers_repository import MongoTeachersRepository
 from courses.infrastructure.mongo_courses_repository import MongoCourseRepository
-from subjects.infrastructure.mongo_subjects_repository import MongoSubjectsRepository
 
 from utils.enums import Tags
 
@@ -40,13 +38,6 @@ def startup_db_clients():
   
   app.courses.connect()
   
-  app.subjects: SubjectRepository = MongoSubjectsRepository({
-    'host': str_connection,
-    'port': int(os.environ['MONGODB_PORT']),
-    'database': os.environ['MONGODB_DATABASE']
-  })
-  
-  app.subjects.connect()
   
   teacher_router.teachers = app.teachers  
   course_router.teachers = app.teachers
@@ -55,8 +46,6 @@ def startup_db_clients():
   course_router.courses = app.courses  
   schedule_router.courses = app.courses  
   
-  course_router.subjects = app.subjects
-  schedule_router.subjects = app.subjects
 
 origins = ["*"]
 
@@ -84,4 +73,3 @@ def message() -> HTMLResponse:
 def shutdown_db_clients():
   app.teachers.disconnect()
   app.courses.disconnect()
-  app.subjects.disconnect()
