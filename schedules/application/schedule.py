@@ -132,7 +132,6 @@ class ScheduleService:
         
         
         required_subject_level = required_subject_sequence[0]
-        required_subject_shift = required_subject_sequence[2]
         required_subject_semester = required_subject_sequence[3]
         
         if (
@@ -142,7 +141,6 @@ class ScheduleService:
             courses = courses + self.course_service.get_courses_by_subject(
               sequence=required_subject_sequence,
               subject=required_subject,
-              shifts=[required_subject_shift]
             )
             
       
@@ -161,7 +159,6 @@ class ScheduleService:
             courses = courses + self.course_service.get_courses_by_subject(
               sequence=extra_subject_sequence,
               subject=extra_subject,
-              shifts=[required_subject_shift]
             )
             
       return courses
