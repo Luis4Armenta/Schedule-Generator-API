@@ -14,11 +14,8 @@ services:
     env_file:
       - .env
     environment:
-      - MONGODB_HOST=mongodb
-      - MONGODB_PORT=27017
+      - MONGODB_CONNECTION_STRING=${MONGODB_CONNECTION_STRING}
       - MONGODB_DATABASE=${MONGODB_DATABASE}
-      - MONGODB_USER=${MONGODB_USER}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
 
   db:
     container_name: mongodb
