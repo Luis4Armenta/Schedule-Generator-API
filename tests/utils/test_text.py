@@ -76,7 +76,7 @@ class TestGenerateRegex(unittest.TestCase):
       
 class TestGetUrlForTeacher(unittest.TestCase):
 
-  @patch('utils.text.clean_name', return_value='JOHN+DOE')
+  @patch('utils.text.clean_name', return_value='JOHN DOE')
   def test_get_url_for_teacher(self, mock_clean_name):
     teacher = 'John Doe'
     expected_url = 'https://foroupiicsa.net/diccionario/buscar/JOHN+DOE'
