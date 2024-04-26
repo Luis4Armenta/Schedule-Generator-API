@@ -24,7 +24,7 @@ class TeacherService:
         name='SIN ASIGNAR',
         comments=[],
         positive_score=0.5,
-        url='https://foroupiicsa.net/diccionario/'
+        url='https://foroupiicsa.net/diccionario/buscar/'
       )
     else:
       # else find in the teacher repo
@@ -40,4 +40,6 @@ class TeacherService:
             positive_score=0.5,
             url=get_url_for_teacher(teacher_name)
           )
+        
+        return teacher
         
